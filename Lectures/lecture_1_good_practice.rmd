@@ -9,6 +9,11 @@ output:
     css: "files/style.css"
 ---
 
+```{r,echo=FALSE}
+## Set default options for the knitr RMD processing
+knitr::opts_chunk$set(echo=TRUE,warning=FALSE,message=FALSE,fig.width=5,fig.height=5,cache=FALSE,autodep=TRUE, results="hide",eval=FALSE)
+```
+
 # 
 
 ## #About
@@ -17,11 +22,7 @@ January Weiner `<january.weiner@gmail.com>`
 
 Core Unit Bioinformatics, Berlin Institute of Health
 
----
-
 ## Berlin Institute of Health
-
-.pull-left[
 
  * Institute for translational and precision medicine
 
@@ -31,25 +32,6 @@ Core Unit Bioinformatics, Berlin Institute of Health
 
  * Since 2020 a part of the Charité
 
-]
-
-
-![](images/charite.jpg)
-
-
-???
-
-Charité – over 15,000 employes
-
-
-
----
-
-
-
-## Course materials
-
-https://github.com/january3/Radvanced2021
 
 ## What I want to give you
 
@@ -57,6 +39,29 @@ https://github.com/january3/Radvanced2021
  * Indoctrination
  * Ability to write code for others
  * Practical tips and tricks
+
+
+## Course materials
+
+https://github.com/january3/Radvanced2022
+
+```{r,eval=TRUE,echo=FALSE}
+library(qrcode)
+plot(qr_code( "https://github.com/january3/Radvanced2022"))
+```
+
+---
+
+## Use git/github
+
+* The easiest way to use this repository is to use git/Rstudio to clone it:
+
+   * File -> New Project -> Version Control -> git
+   * Enter `https://github.com/january3/Radvanced2022` as Repository URL
+   * Select where you want to store the repo
+   * Click on "Create project"
+
+---
 
 ## Course motto
 
@@ -118,14 +123,27 @@ informal methods that reinforce each other.
 it's bad, it's still better than nothing.* [Anonymous]
 
  * make documenting your code as easy as possible
- * first document the why, then the what and the how
- * make documentation easily searchable (use grep, find & co)
+ * first document the why, then the what and then the how
+ * make documentation easily searchable (to use with grep, find & co)
 
 ## Rule #3: Stick to conventions
 
+ * naming conventions: `PascalCase`, `camelCase`, `snake_case`
+ * avoid dots in the middle of a variable name, they have special meaning
  * adopt a naming and formatting style convention, and stick to it
  * keep the same names for variables over and over
  * keep the same project / workspace structure
+
+## Quick exercise
+
+What does the following bit of code do:
+
+```
+. <- 5
+. + 10
+```
+
+What does it produce? Why?
 
 ## Rule #4: Keep your code clean
 
@@ -150,7 +168,6 @@ it's bad, it's still better than nothing.* [Anonymous]
 
 …so prepare in advance!
 
-## Exercise Session [day 1/1](../Exercises/day_1.md)
  
 # Specifics (the gory details)
 
@@ -181,6 +198,9 @@ Anyway, it might clash with the function 'matrix'.*
 
 – Barry Rowlingson, R-help (October 2004)
 
+(Actually, nowadays it would not clash: you can have multiple objects with the same
+name... if they are in different namespaces – but that is another story for
+another time)
 
 ## Keep your syntax clean and standard
 
@@ -209,6 +229,8 @@ Anyway, it might clash with the function 'matrix'.*
  * use spaces to indent your code (not tabs)
  * keep track of the changes you make to your code and project
 
+## Exercise Session [day 1/1](../Exercises/day_1.md)
+
 ## Trying
 
 "Try. Fail. Try again. Fail again. Fail BETTER" (Samuel Beckett)
@@ -221,6 +243,117 @@ if(inherits(res, "try-error")) {
   warning("The operation did not work")
 }
 ```
+# Functions
+
+## Basic function writing
+
+```{r}
+give_me_pie <- function(param) {
+  # do something
+  ret <- pi
+  return(ret)
+}
+```
+
+Note one interesting thing: this is an assignment operation, not a
+declaration like in some other languages. `a` is a variable just like any
+other, but instead of holding a number or a matrix it holds a function.
+
+## "return" is not necessary
+
+Last statement of a function is its return value
+
+```{r}
+myfunction <- function(arg1, arg2) {
+  arg1 + arg2 # same as return(arg1 + arg2)
+}
+```
+
+
+## Setting default parameters
+
+```{r}
+stupid_add_1 <- function(a, b=3) {
+  a + b
+}
+
+stupid_add_2 <- function(a, b=a) {
+  a + b
+}
+
+```
+
+## Matching arguments
+
+```{r}
+myfunction <- function(x, operation="sum") {
+
+  operation <- match.arg(operation, c("sum", "mean"))
+
+  if(operation == "sum") {
+    ret <- sum(x)
+  } else if(operation == "mean") {
+    ret <- mean(x)
+  }
+
+  return(ret)
+}
+
+myfunction(1:100, "s")
+```
+
+## Ellipsis
+
+
+```{r}
+stupid_add_3 <- function(...) {
+  sum(...)
+}
+```
+
+## Ellipsis
+
+Extracting arguments from ellipsis:
+
+```{r}
+ellipsis_check <- function(...) {
+  arguments <- list(...)
+
+  message("Found ", length(arguments), " arguments")
+
+  data.frame(Name=names(arguments))
+}
+
+```
+
+## Ellipsis
+
+Pass on additional arguments for wrapper functions:
+
+```{r}
+density_example <- function(family="normal", n=1000, ...) {
+  family <- match.arg(family, c("normal", "uniform", "exponential"))
+  func <- switch(family,
+                 "normal"=rnorm,
+                 "uniform"=runif,
+                 "exponential"=rexp)
+  x <- func(n=n)
+  plot(density(x), ...)
+}
+```
+
+## Exercise 1/2
+
+
+## Checking
+
+Whoever uses your function will be a malicious idiot indending to mess up
+everything. Even if it just you.
+
+ * Check arguments
+ * If your function throws an error, stop your work and make sure that next time it
+   would first check the arguments and report if anything is problematic
+
 
 ## Documenting functions with roxygen
 
@@ -243,7 +376,7 @@ add2nums <- function(a, b) {
 * `@seealso` – other related functions
 * `@examples` – section with examples
  
-## Exercise Session #2
+## Exercise Session 1/3
 
   "Writing and documenting functions"
 
@@ -278,7 +411,43 @@ In R, almost everything is a function, including most operators:
 
 a <- LETTERS[1:10]
 "["(a, 3) # prints out "C"
+
+"<-"(no_way_this_works, 222)
 ```
+
+## There is a difference between functions and variables
+
+```{r}
+a <- function(x) { print(paste("Hello", x)) }
+a("Bill")
+b <- a
+b("Bill")
+
+## but a is a variable *holding* a function!
+## Consider this two statements
+
+a <- 2
+a # prints out "2"
+2 # also prints out "2"
+
+## So, how about...
+(function(x) { print(paste("Hello", x)) })("Bill")
+```
+
+## This is important!
+
+ * We store functions in variables just like any other data type
+ * how about a vector of functions?
+ * how about passing a function as an argument to another function?
+
+## Passing functions as arguments
+
+```{r}
+boring_data <- list(a=10, b=20, c=1:50)
+
+Reduce(c, boring_data)
+```
+
 
 ## Defining your own operators
 
@@ -299,17 +468,35 @@ You can also use special characters:
 
 Consider the following statements:
 
-    print(length(1/0))
+```{r}
+# example 1
+print(length(1/0))
 
-    f <- function(a=b) { b <- 17 ; print(a) }
-    f()
+# example 2
+f <- function(a=1/0) { print(18) }
 
+# example 3
+f <- function(a=b) { b <- 17 ; print(a) }
+f()
+```
 
-  Which one will throw an error? Why?
+Which one will throw an error? Why? Why not?
 
-## Exercise Session #3
+## Exercise Session 1/4
 
   "R as functional language"
+
+## In R, there are no scalars
+
+ * There are no "scalars" in R (i.e., variables holding just one value)
+ * What looks like a single value is a vector of length 1
+ 
+
+```{r}
+a <- 2
+is.vector(a)
+length(a)
+```
 
 ## Vectorization
 
@@ -369,14 +556,18 @@ iris %>% group_by(Species) %>%
 
 Are all of the following statements true?
 
-    0.1 * 10 * 3 / 3 == 1
-    3 / 3 * 0.1 * 10  == 1
-    3 * 0.1 / 3 * 10  == 1
+```{r}
+0.1 * 10 * 3 / 3 == 1
+3 / 3 * 0.1 * 10  == 1
+3 * 0.1 / 3 * 10  == 1
+```
 
 Solution: use epsilon.
 
-    eps <- 1e-12
-    abs((3 * 0.1 / 3 * 10) - 1) < eps
+```{r}
+eps <- 1e-12
+abs((3 * 0.1 / 3 * 10) - 1) < eps
+```
 
 ## Exercise Session 3
 
@@ -497,147 +688,5 @@ nchar(a)
 ## Be paranoid
 
 A Software Tester walks in a bar...
-
-
-# Functions
-
-## What is a function?
-
-```{r}
-myfunction <- function(arg1, arg2) {
-  ret <- sum(arg1, arg2)
-  return(ret)
-}
-
-myfunction(1, 2)
-a <- 1
-b <- 2
-myfunction(a, b)
-```
-
-## Confusion about arguments
-
-```{r}
-input <- "myfile.txt"
-
-myfunction <- function(input) {
-  print(input)
-}
-
-myfunction(input)
-myfunction("something else entirely")
-another_input <- "another one!"
-myfunction(another_input)
-```
-
-## Default arguments
-
-```{r}
-myfunction <- function(arg1=1, arg2=3) {
-  ret <- sum(arg1, arg2)
-  return(ret)
-}
-
-myfunction(a, b)
-myfunction(a)
-myfunction()
-```
-
-## "return" is not necessary
-
-Last statement of a function is its return value
-
-```{r}
-myfunction <- function(arg1, arg2) {
-  arg1 + arg2 # same as return(arg1 + arg2)
-}
-```
-
-## A slightly more complex example
-
-```{r}
-myfunction <- function(x, operation="sum") {
-
-  if(operation == "sum") {
-    ret <- sum(x)
-  } else if(operation == "mean") {
-    ret <- mean(x)
-  }
-
-  return(ret)
-}
-```
-
-## Matching arguments
-
-```{r}
-myfunction <- function(x, operation="sum") {
-
-  operation <- match.arg(operation, c("sum", "mean"))
-
-  if(operation == "sum") {
-    ret <- sum(x)
-  } else if(operation == "mean") {
-    ret <- mean(x)
-  }
-
-  return(ret)
-}
-
-myfunction(1:100, "s")
-```
-
-## Ellipsis
-
-```{r}
-myfunction <- function(x, operation="sum", ...) {
-
-  operation <- match.arg(operation, c("sum", "mean"))
-
-  if(operation == "sum") {
-    ret <- sum(x, ...)
-  } else if(operation == "mean") {
-    ret <- mean(x, ...)
-  }
-
-  return(ret)
-}
-input <- c(1:100, NA)
-myfunction(input, "s")
-myfunction(input, "s", na.rm=TRUE)
-```
-
-## Ellipsis
-
-```{r}
-myfunction <- function(x, ...) {
-  args <- list(...)
-
-  print(unlist(args))
-}
-
-myfunction(1:100, 1, 12)
-myfunction(1:100, a=1, b=12, na.rm=TRUE)
-```
-
-## Anonymous functions
-
-Pretty much like with regular variables, you don't have to create a
-variable to use the value:
-
-```r
-a <- 2
-a + 3
-2 + 3 ## both are equivalent
-```
-
-Similarly:
-
-```r
-add <- function(a, b) { a + b }
-add(1, 2)
-
-(function(a, b) { a + b })(1, 2)
-```
 
 

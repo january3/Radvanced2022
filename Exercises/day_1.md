@@ -1,4 +1,39 @@
-# Session 1: Keeping your code clean
+# Exercise 1/1: Keeping your code clean
+
+Take some code that you have been working on recently. Check whether the
+code is verbose, clean, commented. Add comments if necessary.
+
+
+# Exercie 1/2: Writing and documenting functions
+    
+ * Write the following functions:
+
+    1. Adds two numbers, but check that the arguments are numeric (use
+       `is.numeric`)
+    2. returns a random number. It takes two parameters: number of random
+       values to generate and the type of distribution (which should be:
+       normal, uniform, binomial: take a look at `rnorm`, `runif`, `rbinom`).
+    3. takes a vector of p-values and returns the smallest p-value (but
+       keep in mind that some values might be NA's!)
+    4. Implement [Fisher's method](https://en.wikipedia.org/wiki/Fisher%27s_method) of combining probabilities 
+
+The following should work:
+
+```r
+## expected: 22
+add_two(5, 17)
+
+## expected: 15 random numbers
+get_a_random(15, "uniform")
+
+## expected: 1e-4
+min_pval(c(0.05, 0.0001, NA, 1e-3))
+
+combine_pvals(c(0.05, 1e-9, 1, 0.7))
+```
+ 
+
+# Exercise 1/3
 
 **A.** Write a function for reading and checking a couple of input files.
 The idea is to have a specialized function to read a particular file format
@@ -19,62 +54,24 @@ the function is supposed to do (for now):
 
     * take as argument names of a few files,
     * read them,
+    * combine them
     * return a data frame.
 
 Document it as best as you can, add comments and placeholders.
 What else can the function do?
 
-
-
-
-# Session 2: Writing and documenting functions
-    
- * Write the following functions:
-
-    1. Adds two numbers, but check that the arguments are numeric 
-    2. returns a random number. It takes two parameters: number of random
-       values to generate and the type of distribution (which should be:
-       normal, uniform, binomial: take a look at `rnorm`, `runif`, `rbinom`).
-    3. takes a vector of p-values and returns the smallest p-value (but
-       keep in mind that some values might be NA's!)
-
-The following should work:
-
-```r
-## expected: 22
-add_two(5, 17)
-
-## expected: 15 random numbers
-get_a_random(15, "uniform")
-
-## expected: 1e-4
-min_pval(c(0.05, 0.0001, NA, 1e-3))
-```
- 
- * What is wrong with the following statement? (NO, I don't mean `"a" + 5`) What would be the correct expression?
-
-    if(!try(b <- "a" + 5)) {
-      warning("This expression is incorrect!")
-    }
-
- * With the function from Session 1,
-
-    * test whether the file exists (`file.exists()`), throw an error if it does not (you can
-      use `try`, `tryCatch`, you can use `stop`; you can also use `warning`...)
-    * test whether the columns contain NA's (and how many), warn if there
-      are any NAs in the ID column
-    * test whether the file really has two columns
-    * test whether IDs are unique and values numeric
-    * return a data frame containing two columns (ID's and numbers)
-    
- * Use 
+ * Optional: check the arguments. Do the files exist? Are the file names a
+   character vector? Do they have the same length?
+ * Optional: Use 
    [roxygen2](https://kbroman.org/pkg_primer/pages/docs.html) style
    formatting to make the
    documentation for your Session 1 function consistent.
 
 
 
-# Session 3: R as functional language
+
+
+# Exercise 1/4: R as functional language
 
  * Define your own operators for all set operations. When do you use the
     back ticks (`` ` ``)? Set operations: `setdiff`, `union`, `intersect`,
@@ -93,7 +90,12 @@ min_pval(c(0.05, 0.0001, NA, 1e-3))
    [this one](../Datasets/annotation.all.csv)) and add an annotation to the
    output.
 
-# Session 4: Vectorization and floating number operators
+ * Create a function that does the following: it takes two arguments, a
+   list and a function. The return value is a list. Then, it applies the function to each element of
+   that list and stores it in the returned list. You are not allowed to use
+   `lapply` or `map_*` functions, use a `for` loop instead.
+
+# Exercise 1/5: Vectorization and floating number operators
 
  * If you haven't done it yet, use lapply/map to read the files in your
    Session 1 function.
