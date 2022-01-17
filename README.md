@@ -25,7 +25,7 @@ read_csv("https://raw.githubusercontent.com/january3/Radvanced2020/master/Data/i
    * File -> New Project -> Version Control -> git
    * Enter `https://github.com/january3/Radvanced2022` as Repository URL
    * Select where you want to store the repo
-   * Click on "Create project"
+   * Click on "Create project", and ready!
 
 * Lectures:
 
