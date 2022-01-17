@@ -1,0 +1,493 @@
+---
+title: "Advanced R:\nRmarkdown and Tidyverse"
+author: "January Weiner"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    css: "files/style.css"
+bibliography: "bibliography.bib"
+---
+
+```{r echo=FALSE,results="hide",message=FALSE,warning=FALSE}
+library(tidyverse)
+```
+
+# (R)markdown
+
+## (R)markdown
+
+Markdown is a markup language: a way of indicating to the computers which
+parts of our text mean what, e.g. what is a header, what is a bullet list
+etc. Markdown is very, very simple and easy to read even when you are human
+(unlike XML or HTML).
+
+(Demo)
+
+## Markdown basics
+
+ * Headers: `#`, `##`, `###`…
+ * *italic* `*italic*` or `_italic_`
+ * **bold** `**bold**` or `__bold__`
+ * bullet lists: start with ` *` (space before!)
+ * numbered lists: start with ` 2.` (space before!)
+ * Superscript: a^2^ `a^2^`, subscript: a~2~ `a~2~`
+
+## So much more
+
+ * tables (you can produce them in R with `kable` or `pander`)
+ * code: demarkated using backticks (`` ` ``)
+ * references: need a BibTeX file (you can get it from google scholar!)
+ * images: `![my_portrait](portrait.jpeg)`
+
+## References
+
+ * By default, always at the end of the document
+ * open a new file, call it `bibliography.bib` or similar
+ * go to Google scholar, search for a paper, click on "BibTeX" and copy the
+   contents to the file
+ * add a line to the header of the Rmarkdown document:
+ 
+       bibliography: "bibliography.bib"
+ 
+ * insert references like this: `[@weiner2018metabolite]` which generates: [@weiner2018metabolite]
+
+
+## Using R in markdown for fun and profit
+
+Inline R code:
+
+    The mtcars data set has `r nrow(mtcars)` rows.
+
+The mtcars data set has `r nrow(mtcars)` rows.
+
+## Using R in markdown for fun and profit
+
+Tables:
+
+```{r}
+library(knitr)
+kable(mtcars[1:4, ])
+```
+
+## Exercise session [2/0](../Exercises/day_2.md)
+
+
+# Tidyverse
+
+## Why tidyverse
+
+> * Cleaner code
+> * Useful automatisation
+> * Great data processing language
+> * Coherent structure of packages
+
+## Why *not* tidyverse
+
+> * Changes the logic of the language
+> * Makes your code depend on tidyverse
+> * Fewer people will understand your code
+> * Easy things are even easier, hard things are even harder
+> * Useful mostly for data frames and lists (but that's not entirely true)
+
+
+# My god, it's full of packages
+
+## Tidyverse overview
+
+![](../files/01_tidyverse_data_science.png){width=600px}
+
+## Tidyverse packages
+
+|Package|What does it do|What does it replace / introduce|
+|-------|---------------|---------------------|
+|rlang|Main tidyverse framework, a redefinition of R|A lot of base R constructs; introduces quosures|
+|tibble|New model of data frames|data frames|
+|dplyr|Main data frame manipulation tool|data frame operations|
+|tidyr|Manipulating data formats, pivoting|e.g. reshape & co|
+|magrittr|Introducing pipes to R|The `%>%` operator & co|
+|purrr|Functional constructs|lapply, sapply & co|
+|readr|read and write data frames|read.table & co|
+|forcats|dealing with factors|introduces goodies for working with factors|
+|stringr|dealing with strings|introduces goodies for working with strings|
+|broom|standardizing output of common functions|`summary()`|
+|ggplot2|Graphics based on "Grammar of graphics"|replaces base plotting utilities|
+
+## How to use tidyverse
+
+ * load with `library(tidyverse)`
+ * some packages (e.g. `magrittr`) need to be loaded separately
+ * never load `plyr` after `dplyr`
+
+# Introducing tibbles
+
+## So many ways to skin a cat
+
+data.frame has so many problems. Luckily, there are also so many solutions.
+
+ * data.table / DT
+ * DataFrame (BioConductor)
+ * colorDF ;-)
+ * tibble (tidyverse, formerly known as data\_frame)
+ * special objects (ExpressionSet, limma/edgeR objects etc.)
+
+## What is special about tibble
+
+ * Hadley Wickham hates row names (and he has reasons)
+ * tbl[,3] returns a tbl rather than a vector
+ * nicer printing (but... colorDF is WAY better ;-))
+ * extra properties (`group_by` etc.)
+
+## Fine, but...
+
+If you want to view more than the default portion of the tibble, do
+
+```{r,results="hide"}
+print(starwars, n=Inf, width=Inf)
+```
+
+Row names: convert them to a column, use filter() instead of `[`
+
+## Reading data with readr
+
+ * read\_{tsv,csv,...}, write…
+ * better, cleaner, faster
+ * explicit
+ * will never turn a string into a factor
+
+## Reading data
+
+---------------------------- ------------------------------- -------------------------- --------------------------
+Data type                    Function                        Tidyverse                  Notes                     
+---------------------------- ------------------------------- -------------------------- --------------------------
+TSV / TAB separated values   `read.table()`                  `read_tsv()`,              Tab is `\t`.              
+                                                             `read_delim()`             A very general and        
+                                                                                        customizable function
+                                                                                                                  
+CSV / comma separated        `read.csv()`,                    `read_csv()`,             a wrapper around          
+                                                              `read_delim()`            `read.table()`            
+                                                                                                                  
+XLS (old Excel)                                               `read_xls()`,             Avoid it!!!               
+                                                              `read_excel()`            From the                  
+                                                                                        `readxl`
+                                                                                        package.
+                                                                                                                  
+XLSX (new Excel)                                              `read_xlsx()`,            From the `readxl` package.      
+                                                              `read_excel()`            You need to                     
+                                                                                        provide the
+                                                                                        sheet number
+                                                                                        you wish to
+                                                                                        read. 
+                                                                                        Note: returns a tibble,
+                                                                                        not a data frame! 
+---------------------------- ------------------------------- -------------------------- --------------------------
+
+
+
+## Exercise Session 2/1
+
+# Introducing Pipes
+
+## Introducing Pipes
+
+Remember? In R, almost everything is a function, but some functions are special: they
+look like operators.
+
+```{r echo=TRUE,results="markdown"}
+vec <- 1:10
+`[`(vec, 2)
+
+`+`(1, 2)
+```
+
+## Introducing Pipes
+
+It is possible to create your own functions which work like operators.
+
+```{r echo=TRUE,results="markdown"}
+`%cup%` <- function(x, y) union(x, y)
+1:10 %cup% 2:15
+
+`%cap%` <- function(x, y) intersect(x, y)
+1:10 %cap% 2:15
+```
+
+The names for the operators here come from the $\LaTeX$ symbol names for
+mathematical set operators $\cup$ ("cup") and $\cap$ ("cap").
+
+<div class="columns-2">
+</div>
+
+## Introducing Pipes
+
+How about an operator that calls just any function? 
+
+```{r, eval=FALSE}
+a %>% some_func(b)
+
+## is the same as
+
+`%>%`(a, some_func(b))
+
+## is the same as
+some_func(a, b)
+```
+
+## Introducing Pipes
+
+Pipes work for *anything*, not just the tidyverse!
+
+```{r}
+df <- data.frame(1:1000)
+
+df %>% head
+```
+
+## Pipes in full: magrittr package
+
+![](../files/MagrittePipe.jpg){width=600px}
+
+## Ceci n'est pas une pipe
+
+Magrittr defines a number of aliases – and of course the pipe operator,
+`%>%`.
+However, there is more to this package.
+
+ * aliases (extract, set\_names etc.)
+ * `%$%` operator (pipe version of `attach`)
+ * `%<>%` operator (instant assignment)
+
+
+
+# dplyr
+
+## dplyr: managing data
+
+ * select, mutate, filter, rename, pull, arrange
+ * distinct, sample\_{n,frac}, add\_count, add\_tally
+ * summarise, \_at, \_if
+ * group\_by
+
+(Demo)
+
+## select
+
+Select columns from data:
+
+    mtcars %>% select(mpg)
+    mtcars %>% select(mpg, Cylinder=cyl)
+    mtcars %>% select(starts_with("d"))
+
+## mutate
+
+Create new columns
+
+    mtcars %>% mutate(lp100km=282.5/mpg)
+
+## filter
+
+Select rows from the data
+
+    mtcars %>% filter(hp > 100)
+    mtcars %>% filter(hp > 100 & cyl < 8)
+
+## pull
+
+Get a single column as a vector
+
+    mtcars %>% pull(mpg)
+
+## arrange
+
+Sort the rows of the data 
+
+```r
+mtcars %>% arrange(mpg)
+```
+
+# Mapping in dplyr
+
+## `group_by`
+
+`group_by` introduces a grouping in a data frame that can be then used by
+`summarise` to calculate something reasonable. This is a lot like `tapply`.
+
+```r
+mtcars %>% group_by(cyl) %>%
+  summarise(m.hp=mean(hp))
+```
+
+## `group_by`
+
+This has the advantage that you can define a whole range of calculations
+based on any column in the data:
+
+```r
+mtcars %>% group_by(cyl) %>%
+  summarise(m.hp=mean(hp), m.wt=mean(wt))
+```
+
+Or you can use a more complex function:
+
+```r
+## which planet has the largest mean BMI?
+starwars %>% group_by(homeworld) %>%
+  summarise(bmi = mean(mass/(height/100)^2))
+```
+
+## Weird, weird world (heavy stuff)
+
+What if we don't want to choose a variable by hand?
+
+```r
+mtcars %>% group_by(cyl) %>% summarise_all(mean)
+```
+
+Or, if we want something more complex, we use the `~ ...` form:
+
+```r
+mtcars %>% group_by(cyl) %>% summarise_all(~ mean(.)/sd(.))
+```
+
+The dot (`.`) stands for the argument. 
+
+
+
+
+## Exercise Session 2/2
+
+# Wide and Long data format
+
+## Wide and Long format
+
+ Long (stacked, tall, narrow) advantages:
+
+  * easier to filter, process, visualize, do statistics with
+  * focused on measurement ("patient ID" or equivalent is a covariate, and so is measurement type)
+
+ Wide (un-stacked) advantages:
+
+  * groups data by a covariate ("patient ID")
+  * can be easier to manage (each column one measurement type)
+  * can be more compact
+
+## Long vs wide data
+
+ `pivot_longer()`, `pivot_wider()`
+
+## Converting from wide to long:
+
+```{r, results="hide"}
+wide <- read.table(header=TRUE, text='
+ subject sex control cond1 cond2
+       1   M     7.9  12.3  10.7
+       2   F     6.3  10.6  11.1
+       3   F     9.5  13.1  13.8
+       4   M    11.5  13.4  12.9
+')
+pivot_longer(wide, control:cond2, names_to="key",
+             values_to="measurement")
+```
+
+## Converting from wide to long:
+
+```{r}
+wide <- read.table(header=TRUE, text='
+ subject sex control cond1 cond2
+       1   M     7.9  12.3  10.7
+       2   F     6.3  10.6  11.1
+       3   F     9.5  13.1  13.8
+       4   M    11.5  13.4  12.9
+')
+pivot_longer(wide, control:cond2, names_to="key",
+             values_to="measurement")
+```
+
+
+## Converting from long to wide
+
+```{r}
+long <- read.table(header=TRUE, text='
+ subject  sampleID sex condition measurement
+       1  ID000001 M   control         7.9
+       1  ID000002 M     cond1        12.3
+       1  ID000003 M     cond2        10.7
+       2  ID000004 F   control         6.3
+       2  ID000005 F     cond1        10.6
+       2  ID000006 F     cond2        11.1
+       3  ID000007 F   control         9.5
+       3  ID000008 F     cond1        13.1
+       3  ID000009 F     cond2        13.8
+')
+```
+
+## Converting from long to wide
+
+```{r}
+## not what we wanted!!!
+pivot_wider(long, names_from="condition", values_from="measurement")
+
+## Instead: 
+pivot_wider(long, id_cols=subject, names_from="condition", values_from="measurement")
+```
+
+## Long vs wide data: which one to choose?
+
+ * What is the target of the data?
+    * analysis, storage, data exchange: long format
+    * results presentation, overview: wide format (possibly)
+ * What is the unit of observation?
+    * one unit = one row
+
+
+
+## group\_by
+
+Essentially, add information to the tibble that the data is grouped by a
+variable. This does not change the actual data!
+
+```{r}
+identical(table2, table2 %>% group_by(country))
+identical(as.data.frame(table2), 
+          as.data.frame(table2 %>% group_by(country)))
+```
+
+You can then use several other functions.
+
+## Use with caution!
+
+While tidyverse is great for interactive work, you should use it with
+caution in your packages:
+
+```{r eval=FALSE}
+foo <- function(df) {
+  cols <- c("sex", "age")
+  df %<>% select(cols)
+
+  # ... do something
+
+  return(df)
+} 
+```
+
+What happens when df contains `cols`?
+
+## Solution
+
+Be wary of tidyverse shortcuts. Always assume the worst case scenario and
+be explicit in your code:
+
+```{r eval=FALSE}
+# make sure you select columns from variable 
+# and not by name
+df %<>% select(all_of(cols))
+
+# or, to use all but the columns in cols
+df %<>% select(!all_of(cols))
+```
+
+
+## Exercise Session 2/3
+
+

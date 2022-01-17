@@ -1,0 +1,89 @@
+---
+title: " "
+author: "January Weiner"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    css: "files/style.css"
+---
+
+
+```{r,echo=FALSE}
+## Set default options for the knitr RMD processing
+knitr::opts_chunk$set(echo=TRUE,warning=FALSE,message=FALSE,fig.width=5,fig.height=5,cache=TRUE,autodep=TRUE, results="hide")
+```
+
+```{r}
+library(tidyverse)
+library(ggthemes)
+library(cowplot)
+theme_set(theme_grey())
+```
+
+
+
+# Cool R packages
+
+## glue: For quickly generating messages
+
+```{r,echo=TRUE,results="markdown"}
+myvar <- "testing"
+library(glue)
+
+print(glue("This is {myvar}, this is {myvar}!"))
+```
+
+## lubridate: for easy date conversions
+
+```{r,echo=TRUE,results="markdown"}
+library(lubridate)
+
+dmy(c("1st of January, 2020", "1 Jan 1919", "23-9-2021"))
+mdy_hm("January, 27th 2017, 1:12 PM")
+```
+
+
+## see: cool features for ggplot
+
+
+```{r,fig.width=10,fig.height=4.5}
+library(see)
+p1 <- ggplot(iris, aes(x = Species, y = Sepal.Length, fill = Species)) +
+  geom_violindot(fill_dots = "lightgrey") +
+  theme_blackboard() +
+  scale_fill_material_d() 
+p3 <- ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Sepal.Length)) +
+  geom_point2() +
+  theme_modern() +
+  scale_color_material_c(palette = "rainbow")
+plots(p1, p3, n_columns=2)
+```
+
+## hrbrthemes: cool themes for ggplot
+
+```{r hrbrthemes,eval=FALSE}
+library(hrbrthemes)
+ggplot(mtcars, aes(mpg, wt)) + geom_point(aes(color=factor(carb))) +
+  labs(x="Fuel efficiency (mpg)", y="Weight (tons)",
+       title="Seminal ggplot2 scatterplot example",
+       subtitle="A plot that is only useful for demonstration purposes",
+       caption="Brought to you by the letter 'g'") + 
+  scale_color_ipsum() + theme_ipsum_rc()
+```
+
+## hrbrthemes: cool themes for ggplot
+
+```{r hrbrthemes,echo=FALSE,fig.width=10}
+```
+
+
+## sjPlot: various great utils
+
+```{r results="markdown"}
+library(sjPlot)
+data(mtcars)
+m.mtcars <- lm(mpg ~ cyl + hp + wt, data = mtcars)
+tab_model(m.mtcars)
+```

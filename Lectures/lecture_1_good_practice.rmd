@@ -1,0 +1,614 @@
+---
+title: " "
+author: "January Weiner"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    css: "files/style.css"
+---
+
+# 
+
+## #About
+
+January Weiner `<january.weiner@gmail.com>`
+
+Core Unit Bioinformatics, Berlin Institute of Health
+
+
+## Course materials
+
+https://github.com/january3/Radvanced2021
+
+## What I want to give you
+
+ * Make R friendly
+ * Indoctrination
+ * Ability to write code for others
+ * Practical tips and tricks
+
+## Course motto
+
+> R is a shockingly dreadful language for an exceptionally useful data
+> analysis environment. The more you learn about the R language, the worse
+> it will feel. The development environment suffers from literally decades
+> of accretion of stupid hacks from a community containing, to a
+> first-order approximation, zero software engineers. R makes me want to
+> kick things almost every time I use it.
+
+Tim Smith, Kevin Ushey, [arrGh: a newcomer’s (angry) guide to R](http://arrgh.tim-smith.us/)
+
+## How the course will look like
+
+ * Lectures
+ * Excercises
+ * Scripts
+ * Your own projects
+
+
+# Why "good coding practices"?
+
+
+## Rule #1: Language is for communication
+
+Code is a tool of your science, science is all about communication, therefore:
+
+ * Your code will be inspected by others
+ * Documentation is not only for you
+ * Coding is a part of your science, then make it so!
+ * Reproducibility matters
+
+ 
+## Literate programming (Donald E. Knuth)
+
+I believe that the time is ripe for significantly better documentation of
+programs, and that we can best achieve this by considering programs to be
+works of literature. Hence, my title: "Literate Programming."
+
+Let us change our traditional attitude to the construction of programs:
+Instead of imagining that our main task is to instruct a computer what to
+do, let us concentrate rather on explaining to human beings what we want a
+computer to do.
+
+## Literate Programming (Donald E. Knuth)
+
+The practitioner of literate programming can be regarded as an essayist,
+whose main concern is with exposition and excellence of style. Such an
+author, with thesaurus in hand, chooses the names of variables carefully
+and explains what each variable means. He or she strives for a program that
+is comprehensible because its concepts have been introduced in an order
+that is best for human understanding, using a mixture of formal and
+informal methods that reinforce each other.
+ 
+
+## Rule #2: Document your code
+
+*Documentation is like pizza: if it's good, it's really, really good. If
+it's bad, it's still better than nothing.* [Anonymous]
+
+ * make documenting your code as easy as possible
+ * first document the why, then the what and the how
+ * make documentation easily searchable (use grep, find & co)
+
+## Rule #3: Stick to conventions
+
+ * adopt a naming and formatting style convention, and stick to it
+ * keep the same names for variables over and over
+ * keep the same project / workspace structure
+
+## Rule #4: Keep your code clean
+
+ * meaningful variable names
+ * refactor your code
+ * organize your code (packages!)
+ * keep your functions short
+ * keep a line length of approximately 80 chars
+
+## Rule #5: Simplify!
+
+ * make your code as simple as possible
+ * make your functions versatile and simple
+ * use simple data types if possible
+ * don't overdo it!
+
+## Rule #6: You never know
+
+ * what your code evolves into
+ * when you will need to publish it
+ * when someone will want to see it
+
+…so prepare in advance!
+
+## Exercise Session [day 1/1](../Exercises/day_1.md)
+ 
+# Specifics (the gory details)
+
+## Before you start
+
+ * think what you want to do
+ * make a plan, use paper and pencil
+ * use google and stackoverflow, do not reinvent the wheel
+ * learn to use (r)markdown
+
+
+## How to write code
+
+ * use a naming convention (eg. with.period, with\_underscore or camelCase)
+ * strive for meaningful variables…
+ * …but keep them concise
+ * make function and variable names easy to distinguish (e.g. noun vs verb
+   or use a prefix)
+ * make it easy to distinguish less important (e.g. local) variables and
+   functions from those which are important
+ * package your code in functions, don't use globals
+ * package your functions in packages, don't use scripts 
+
+##
+
+*Firstly, don't call your matrix 'matrix'. Would you call your dog 'dog'?
+Anyway, it might clash with the function 'matrix'.*
+
+– Barry Rowlingson, R-help (October 2004)
+
+
+## Keep your syntax clean and standard
+
+ * there are many coding styles, but they have lots in common
+ * spaces around operators
+ * always use `<-` for assignment (never `=`)
+ * use double hash (`##`) if comments starts in a new line 
+ * avoid semicolons
+ * use curly braces even when not necessary (e.g. in `if() … else …`)
+
+
+## Organize your work space
+
+ * readme.rmd or readme.txt files in every directory
+ * workspaces / projects and always know where you are
+ * standard project structure
+ * meaningful file names
+ * standard file extensions (`.R`, `.rda`, `.tsv`, `.csv`)
+
+## A matter of taste
+
+ * use `stop()`, `try()`/`tryCatch()`, `warn()` and `message()`
+ * don't use `attach()` (use tidyverse instead!)
+ * row names, should one use them?
+ * use `rmarkdown` / `roxygen2` to document your functions on the go
+ * use spaces to indent your code (not tabs)
+ * keep track of the changes you make to your code and project
+
+## Trying
+
+"Try. Fail. Try again. Fail again. Fail BETTER" (Samuel Beckett)
+
+```r
+res <- try(exp(42))
+res <- try(exp("forty two"))
+
+if(inherits(res, "try-error")) {
+  warning("The operation did not work")
+}
+```
+
+## Documenting functions with roxygen
+
+```r
+#' Function for adding two numbers
+#' @param a first number
+#' @param b second number
+#' @return sum of the numbers
+add2nums <- function(a, b) {
+  a + b
+}
+```
+
+## More on that
+
+* always start with `#' `
+* `@param` – parameter
+* `@return` – return value
+* `@export`– the function should be accessible to users
+* `@seealso` – other related functions
+* `@examples` – section with examples
+ 
+## Exercise Session #2
+
+  "Writing and documenting functions"
+
+
+
+# R as a functional language
+
+## Functional languages
+
+  * Clean: Haskell, Clean, PureScript
+  * Impure: C++, Java, Python, R
+  * functional programming paradigm:
+      * functions are called by arguments only and do not modify any
+        environmental variables
+      * vectorization
+      * higher order functions, closures and anonymous functions
+
+## Pure functions
+
+Pure functions do not modify their environment and their return value
+determistically depends on the arguments. This is often not
+possible (think: randomization, reading data).
+
+However, they have many advantages and it is worth pursuing them.
+
+## Everything is a function
+
+In R, almost everything is a function, including most operators:
+
+```r
+"+"(1, 2)
+
+a <- LETTERS[1:10]
+"["(a, 3) # prints out "C"
+```
+
+## Defining your own operators
+
+Use `%...%` to define your own operators:
+
+    %M% <- function(a, b) setdiff(a, b)
+
+    1:10 %M% 3:4 
+    # same as: setdiff(1:10, 3:4)
+
+    %P% <- function(a, b) paste0(a, b)
+
+You can also use special characters:
+
+    `%-%` <- function(a, b) setdiff(a, b)
+
+## Strict vs lazy evaluation
+
+Consider the following statements:
+
+    print(length(1/0))
+
+    f <- function(a=b) { b <- 17 ; print(a) }
+    f()
+
+
+  Which one will throw an error? Why?
+
+## Exercise Session #3
+
+  "R as functional language"
+
+## Vectorization
+
+Means operating on vectors and matrices rather than on single values.
+Instead of using a `for` loop to walk over all elements of a vector, one
+calls a function which operates on the vector as a whole. This is how
+standard R functions (such as `+`) work.
+
+Some vectorized functions:
+
+ * practically everything
+ * most of the basic functions like `sum`, `log`, `sd`, `mean`
+ * `colMeans`, `colSums`, `rowMeans`, `rowSums` do exactly what they say
+ * make sure your functions are vectorized as well!
+ * if you can't find a vectorized function, use `*map*` / `*apply`
+
+## Vectorization
+
+Use `*apply` and, from tidyverse's `purrr` package, `*map*` instead of
+loops. Loops in R are almost never necessary.
+
+However, for some tasks, don't be a purist. `for` is there for a reason
+(although you might consider the `walk` family of functions from `purrr`).
+
+Remember, there are no single values in R. Even `1` is a vector (of length
+1).
+
+## Vectorization
+
+```{r, eval=FALSE}
+data(iris)
+## per species median
+tapply(iris[,1], iris$Species, median)
+
+species <- unique(iris$Species)
+names(species) <- species
+mysummary <- function(sp, species_vec, dataset, col) {
+  x <- dataset[[col]]
+  x <- x[ sp  == species_vec ]
+  c(mean(x), median(x), IQR(x))
+}
+
+lapply(species, mysummary, iris$Species, iris, "Sepal.Width")
+```
+
+## Vectorization – the tidyverse solution
+
+```{r, eval=FALSE}
+library(tidyverse)
+iris %>% group_by(Species) %>% 
+  summarise(median=median(Sepal.Width), mean=mean(Sepal.Width))
+```
+
+# Common pitfalls
+
+## Floating point
+
+Are all of the following statements true?
+
+    0.1 * 10 * 3 / 3 == 1
+    3 / 3 * 0.1 * 10  == 1
+    3 * 0.1 / 3 * 10  == 1
+
+Solution: use epsilon.
+
+    eps <- 1e-12
+    abs((3 * 0.1 / 3 * 10) - 1) < eps
+
+## Exercise Session 3
+
+  "Vectorization and floating point operations"
+
+## Factors, factors everywhere
+
+Factors are "tricky little devils". Be especially wary of factors that look
+like numbers. For example:
+
+    foo <- data.frame(ID=c(10:1, "a"))
+
+Factors are often silenty translated either to a numeric or character type.
+Strange things can happen then. Solution:
+
+    options(stringsAsFactors=FALSE)
+
+
+## data.frame with one column
+
+R's default data frames quietly turn to a vector when only one column is
+selected. This is usually not the desired outcome and can be avoided with
+
+    foo[, 1, drop=FALSE]
+
+## Partial matching behind `$`
+
+
+```r
+a <- list()
+a$coefficient <- 2
+a$c # result: 2
+```
+
+Solution:
+
+    options(warnPartialMatchDollar = TRUE)
+     
+## The Namibia problem
+
+By default, "NA" in data read means "not available", so if "NA" is a valid
+string (e.g. abbreviation of "Namibia"), trouble ensues.
+
+Solution:
+
+```r
+na.strings=NULL
+```
+
+## Precedence
+
+    What does the following do?
+
+```r
+n <- 10
+for(i in 1:n-1) print(i)
+```
+
+## Typos
+
+What *exactly* will happen here?
+
+```r
+a <- FALSE
+
+if(a = TRUE) {
+  print("a is true!")
+}
+```
+
+## & vs &&
+
+* `&&`: operator taking two values 
+
+* `&`: vectorized version
+
+```{r}
+a <- c(TRUE, TRUE)
+b <- c(TRUE, FALSE)
+a && b
+a & b
+```
+
+## & vs &&
+
+```{r}
+if(a && b) { print("TRUE!") }
+if(a & b) { print("TRUE!") }
+```
+
+## Forgetting to use `any`
+
+```{r}
+vec <- c(1, 2, NA, 3, 4)
+
+if(is.na(vec)) { print("NA's found!") } else { print("No NA's!") }
+
+if(any(is.na(vec))) { print("NA's found!") } else { print("No NA's!") }
+```
+
+## Changing one element may change the type of a vector
+
+```{r}
+a <- 1:10
+typeof(a)
+a[1] <- "a"
+typeof(a)
+```
+
+## Confusing `length` with `nchar`
+
+```{r}
+a <- "January Weiner"
+length(a)
+nchar(a)
+```
+
+## Be paranoid
+
+A Software Tester walks in a bar...
+
+
+# Functions
+
+## What is a function?
+
+```{r}
+myfunction <- function(arg1, arg2) {
+  ret <- sum(arg1, arg2)
+  return(ret)
+}
+
+myfunction(1, 2)
+a <- 1
+b <- 2
+myfunction(a, b)
+```
+
+## Confusion about arguments
+
+```{r}
+input <- "myfile.txt"
+
+myfunction <- function(input) {
+  print(input)
+}
+
+myfunction(input)
+myfunction("something else entirely")
+another_input <- "another one!"
+myfunction(another_input)
+```
+
+## Default arguments
+
+```{r}
+myfunction <- function(arg1=1, arg2=3) {
+  ret <- sum(arg1, arg2)
+  return(ret)
+}
+
+myfunction(a, b)
+myfunction(a)
+myfunction()
+```
+
+## "return" is not necessary
+
+Last statement of a function is its return value
+
+```{r}
+myfunction <- function(arg1, arg2) {
+  arg1 + arg2 # same as return(arg1 + arg2)
+}
+```
+
+## A slightly more complex example
+
+```{r}
+myfunction <- function(x, operation="sum") {
+
+  if(operation == "sum") {
+    ret <- sum(x)
+  } else if(operation == "mean") {
+    ret <- mean(x)
+  }
+
+  return(ret)
+}
+```
+
+## Matching arguments
+
+```{r}
+myfunction <- function(x, operation="sum") {
+
+  operation <- match.arg(operation, c("sum", "mean"))
+
+  if(operation == "sum") {
+    ret <- sum(x)
+  } else if(operation == "mean") {
+    ret <- mean(x)
+  }
+
+  return(ret)
+}
+
+myfunction(1:100, "s")
+```
+
+## Ellipsis
+
+```{r}
+myfunction <- function(x, operation="sum", ...) {
+
+  operation <- match.arg(operation, c("sum", "mean"))
+
+  if(operation == "sum") {
+    ret <- sum(x, ...)
+  } else if(operation == "mean") {
+    ret <- mean(x, ...)
+  }
+
+  return(ret)
+}
+input <- c(1:100, NA)
+myfunction(input, "s")
+myfunction(input, "s", na.rm=TRUE)
+```
+
+## Ellipsis
+
+```{r}
+myfunction <- function(x, ...) {
+  args <- list(...)
+
+  print(unlist(args))
+}
+
+myfunction(1:100, 1, 12)
+myfunction(1:100, a=1, b=12, na.rm=TRUE)
+```
+
+## Anonymous functions
+
+Pretty much like with regular variables, you don't have to create a
+variable to use the value:
+
+```r
+a <- 2
+a + 3
+2 + 3 ## both are equivalent
+```
+
+Similarly:
+
+```r
+add <- function(a, b) { a + b }
+add(1, 2)
+
+(function(a, b) { a + b })(1, 2)
+```
+
+

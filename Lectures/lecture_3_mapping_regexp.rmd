@@ -1,0 +1,476 @@
+---
+title: " "
+author: "January Weiner"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    css: "files/style.css"
+---
+
+```{r,echo=FALSE,results="hide",message=FALSE,warning=FALSE}
+## Set default options for the knitr RMD processing
+knitr::opts_chunk$set(echo=TRUE,eval=FALSE,warning=FALSE,message=FALSE,fig.width=5,fig.height=5,cache=FALSE,autodep=TRUE, results="hide")
+library(tidyverse)
+library(readxl)
+library(beeswarm)
+```
+
+
+
+# Mapping
+
+## Mapping functions
+
+`lapply` takes two arguments: 
+
+  * a vector or a list, 
+  * a function
+
+Then, it applies the function to each element of the vector / list and
+returns a list (with one element per list).
+
+## Example
+
+```{r eval=FALSE}
+fn <- c("em.txt", "pstrem.txt", "bzdrem.txt")
+res <- lapply(fn, read.table)
+lapply(res, summary)
+```
+
+## Example with data frames
+
+Remember: data frames are also lists!
+
+```{r eval=FALSE}
+annot <- read.csv("annotation.all.csv")
+
+## what are the variable types?
+lapply(annot, class)
+
+## how many missing data?
+count_nas <- function(x) {
+  sum(is.na(x))
+}
+lapply(annot, count_nas)
+```
+
+
+## How to understand mapping
+
+In R, functions can be passed as arguments.
+
+```{r eval=FALSE}
+my_lapply <- function(x, func) {
+  n <- length(x)
+  ret <- list()
+  for(i in 1:n) {
+    ret[[i]] <- func(x[[i]])
+  }
+  names(ret) <- names(x)
+  return(ret)
+}
+```
+
+## Closures
+
+Creating a function with `foox <- function(x) { ... }` is not different
+from assigning a value to a variable, like `foox <- 2`. Just like you don't
+have to use `foox` when you mean `2`, but can use `2` directly, you don't
+have to assign function to a variable, but can use `function(x) { ... }`
+directly:
+
+```{r eval=FALSE}
+## because of precedence, we need brackets
+(function(a, b){ a + b })(1, 2) 
+
+## is the same as
+add_two <- function(a, b){ a + b }
+add_two(1, 2)
+```
+
+## Mapping in R / in R + tidyverse
+
+We can use closures always:
+
+```{r, eval=FALSE}
+tmp <- list(a=1, b=2, c=1:10)
+
+lapply(tmp, length)
+lapply(tmp, function(x) paste(x, collapse=", "))
+```
+
+Remember: `.` in R is just a letter, it can be a variable. The last part
+can be
+
+```{r eval=FALSE}
+lapply(tmp, function(.) paste(., collapse=", "))
+```
+
+## Mapping in R / in R + tidyverse
+
+```{r eval=FALSE}
+map(tmp, ~ paste(., collapse=", "))
+
+## type conversion is always specified
+map_chr(tmp, ~ paste(., collapse=", "))
+```
+
+## Why both worlds?
+
+ * The \*pply functions are still widely used, so you will see them in code
+ * sometimes using tidyverse does not really give you a bonus (90% of the
+   cases a regular lapply will do)
+ * tidyverse notation with `~` is a bit more concise, but as any shorthand,
+   it can be confusing
+
+## Why not use `group_by` and `summarise`?
+
+Thes functions work on data frames – lists of vectors of *equal* length.
+They don't work on lists of vectors which have different lengths!
+
+On the other hand, \*pply family and the purrr functions work also on data
+frames (because data frames are lists!).
+
+Also, mapping functions are way more powerful.
+
+## lapply & sapply
+
+`lapply` takes a list and returns a list, always.
+
+`sapply` takes a list and tries to simplify it to a relevant object (data
+frame, vector etc.). Which sometimes fails.
+
+Compare:
+
+```{r,eval=FALSE}
+lapply(starwars$name, nchar)
+sapply(starwars$name, nchar)
+```
+
+## `replicate`
+
+This is a special form of `sapply` which simply calls a function `n` times
+and returns the results in a list. *Note that it uses an expression and not
+a function as a second argument.*
+
+```{r eval=FALSE}
+## create 10 vectors with random numbers
+replicate(10, rnorm(10), simplify=FALSE)
+```
+
+## General form
+
+```{r eval=FALSE}
+xxxapply(data, ..., function)
+```
+
+Where `function` can be a closure (anonymous function), defined in place:
+
+```{r eval=FALSE}
+## replace spaces by underscores
+sapply(starwars$name, 
+  function(x) 
+      gsub(" ", "_", starwars$name))
+```
+
+
+## apply
+
+`apply` is for data frames and matrices (two-dimensional objects).
+The second argument determines whether it works row-wise (1) or column-wise
+(2):
+
+
+```{r eval=FALSE}
+## matrix of random numbers, 3 x 20
+mtx <- matrix(rnorm(60), ncol=3)
+
+apply(mtx, 1, sum)
+apply(mtx, 2, sum)
+```
+
+## There is a simpler way
+
+Don't forget following convenience functions:
+
+ * `colSums`, `colMeans`
+ * `rowSums`, `rowMeans`
+
+(However, there is no colSD or rowSD)
+
+## tapply
+
+`tapply`  applies a function to vector split by levels of a factor. For
+example, we might want to know what is the mean mpg for cars with different
+number of cylinders:
+
+```{r}
+tapply(mtcars$mpg, mtcars$cyl, mean)
+```
+
+This is a really useful function.
+
+## Exercise 3/1
+
+# `purrr`
+
+## `map` and co.
+
+`map` works very much like `sapply(..., simplify=F)`, and its variants
+explicitely try to cast the result in an appriopriate format.
+
+ * `map_lgl` -- logical vector
+ * `map_chr` -- character vector
+ * `map_int` -- integer vector
+ * `map_dbl` -- double (floating point) vector
+
+## The weird syntax of `map`
+
+To make the map functions more terse, map family adopted a particular way
+of formulating custom functions. `.` (dot) is automatically used as
+argument, and instead of writing `function(x) ...` you write `~ ...`:
+
+ * sapply:
+
+        ## return 1, 2, ... 10 random numbers
+        sapply(1:10, function(x) rnorm(x))
+
+ * map:
+
+        map(1:10, ~ rnorm(.))
+
+## Formula notation in dplyr
+
+The same notation can be used also in dplyr with the `mutate_all` and
+`rename_all` functions:
+
+```{r eval=FALSE}
+## Replace "none" by NA 
+starwars %>% mutate_all(~ gsub("none", NA, .))
+
+## Modify all variable names
+starwars %>% rename_all(~ paste0("Var_", .))
+```
+
+## `map_dfr` and `map_dfc`
+
+These two create a data frame. If your function returns each time a data
+frame, map will join these – either by rows (`map_dfr`) or by
+columns (`map_dfc`).
+
+```{r eval=FALSE}
+## create a list with 10 random vectors
+rv <- map(1:10, ~ rnorm(10))
+names(rv) <- LETTERS[1:10]
+
+## calculate the mean and sd
+map_dfr(rv, ~ data.frame(mean=mean(.), sd=sd(.)))
+map_dfc(rv, ~ c(mean=mean(.), sd=sd(.)))
+```
+
+## `map2` et co.
+
+Sometimes you want to go over two or more vectors at the same time. 
+Instead of `.` you have two automatic variable names, `.x` and `.y`.
+
+```{r eval=FALSE}
+## add number of vehicles to each name
+sw_names <- starwars$name
+sw_vehcls <- starwars$vehicles
+map2_chr(sw_names, sw_vehcls, 
+  ~ paste0(.x, "_", length(.y)))
+```
+
+## `pmap` and co.
+
+`pmap` uses a list of vectors of identical length and passes all its
+columns as `...` to a function.
+
+```{r eval=FALSE}
+data <- list(a=1:3, b=rnorm(3), c=3:1)
+pmap(data, ~ sum(...))
+```
+
+
+## `pmap` and co.
+
+Remember: data.frame is also a list! So you
+can apply pmap to a data frame and process each row.
+
+```{r eval=FALSE}
+starwars %>% 
+  select(name, hair_color, eye_color) %>% 
+  mutate_all(~ gsub("none", NA, .)) %>%
+  drop_na() %>%
+  pmap_chr(~ sprintf("%s has %s hair and %s eyes", ...))
+```
+
+
+## `imap_*` functions
+
+Very useful! Instead of having only `.` for the actual element, we have
+`.x` for the element and *additionally* `.y` which holds this elements
+name.
+
+```{r}
+vec <- list(last_name="Gates", first_name="Bill")
+map_chr(vec, ~ paste0(.y, ": ", .x)
+```
+
+
+
+## Exercise 3/2
+
+
+# Regular expressions
+
+## regexp: regular expressions
+
+regexp is for matching patterns to strings. A basic unit of regexp is an
+atom, which can be followed by a modifier. Examples:
+
+ * `a` – (atom) match the literal "a" (and not A!)
+ * `a*` – (atom + modifier) match "a" any number of times (including zero!)
+ * `a+` – (atom + modifier) match "a" at least once
+ * `a?` – (atom + modifier) match "a" zero or once
+ * `.` – (atom) match anything
+ * `.*` – (atom + modifier) match anything any number of times
+ * `[...]` – (atom) match any letter between the brackets
+ * `[^...]` – (atom) match anything *but* a letter between the brackets
+ 
+## Examples
+
+```{r}
+gsub("a+", "%", "q a aa aaa")
+gsub("a*", "%", "q a aa aaa")
+gsub("a?", "%", "q a aa aaa")
+gsub("[abcdz]", "%", "abcdefghijklmnopqrstuvwz")
+gsub("[a-cu-z]", "%", "abcdefghijklmnopqrstuvwz")
+```
+
+## Ranges / classes
+
+```{r}
+gsub("[[:alnum:]]", "@", "2 + 3 * a = 10")
+```
+
+Some classes:
+
+ * `[:alpha:]` - all characters (a-z, A-Z)
+ * `[:space:]` – all spaces (tabs etc)
+ * `[:graph:]` – characters + punctuations
+
+
+Look up `?regexp` for more.
+
+
+
+## Other important modifiers
+
+  * `^`: if at the beginning of a regexp, then it matches only the
+    beginning of the string, so `^oo` matches "oo" but not "Atchoo".
+  * `$`: same, but at the end of a regexp: `oo$` matches "poo" but not
+    "Winnie the Pooh"
+  * `^oo$` matches "oo" and nothing else
+
+## how to match a modifier?
+
+How do you match a star, or a question mark?
+
+Prepend it with *two* backslashes:
+
+    x <- c("abcde", "abce","abcd?e")
+
+    # matches "abcde" and "abce":
+    grep("abcd?e", x)
+
+    # matches "abcd?e":
+    grep("abcd\\?e")
+
+## Why two backslashes
+
+Backslash in R is *always* for creating "special" characters. For example,
+`\n` means a new line. So to actually get a backslash, you need to precede
+it with a backslash: `\\`. In other languages it may be different or depend
+on the context.
+
+## What can we use it for
+
+ * Searching through a vector: with `grep()`  or `grepl()`
+ * Substituting in a vector: with `sub()`  or `gsub()`
+ * Searching within a string: with `regexpr()` or `gregexpr()`
+
+## The coolest part: groups
+
+You can easily extract matched fragments from strings:
+
+```{r}
+input <- "name:January last_name:Weiner"
+
+gsub("name:(.*) last_name:(.*)", "\\2 \\1", input)
+```
+
+## Group example
+
+Problem: botched identifiers, fusing sample ids and individual IDs.
+
+```{r}
+identifiers <- c("S001 ID9835", "S002-ID12363", "S003_ID84755")
+```
+
+
+Many ways to handle this.
+
+## Group example
+
+```{r}
+identifiers <- c("S001 ID9835", "S002-ID12363", "S003_ID84755")
+data.frame(ids=identifiers) %>% separate(ids, sep="[- _]", into=c("sample", "ID"))
+```
+
+## Group example
+
+
+```{r}
+identifiers <- c("S001 ID9835", "S002-ID12363", "S003_ID84755")
+
+data.frame(ids=identifiers) %>% separate(ids, sep="[- _]", into=c("sample", "ID"))
+
+strsplit(identifiers, "[- _]")
+```
+
+## Group example
+
+```{r}
+identifiers <- c("S001 ID9835", "S002-ID12363", "S003_ID84755")
+
+regex <- "(S[0-9]+)[ -_](ID[0-9]+)"
+data.frame(
+  sample=gsub(regex, "\\1", identifiers),
+  ID=gsub(regex, "\\1", identifiers))
+```
+
+
+
+
+## Exercise 3/3
+
+# Cleaning up data
+
+## Cleaning up data: diagnostics
+
+ * Never trust the data
+ * *Not even your own*
+ * use tibbles (and/or colorDF) to display data frames
+ * Check whether data types are what they are supposed to be
+ * Check whether factors have the expected number of levels
+    * Use `unique` to figure out how many different values there are in a
+      vector
+ * Check whether numbers have the correct range
+ * Check whether character / numeric vectors are not factors by mistake
+
+## Exercise 4/3
+
+

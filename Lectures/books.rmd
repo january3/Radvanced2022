@@ -1,0 +1,76 @@
+---
+title: "Suggested books"
+author: "January Weiner"
+output: html_document
+---
+
+Books which I have shown you during the course:
+
+ 1. R Cookbook by Paul Teetor
+
+ 2. R Graphics Cookbook by Winston Chang, [available online](https://r-graphics.org/)
+
+ 3. The R Book by Michael J. Crawley – a great guide to statistics with R
+
+ 4. Visual Display of Quantitative Information by Edward Tufte: a beautiful
+    book discussing principles of data presentation.
+
+Use the way of R:
+
+ 1. [R Inferno](http://www.burns-stat.com/pages/Tutor/R_inferno.pdf)
+
+ 2. [arRgh](http://arrgh.tim-smith.us/)
+
+
+Suggested general Links:
+
+ 1. Cheat sheets:
+   * [R cheat sheet](https://rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf)
+   * [ggplot2](https://rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
+
+ 1. Formatting style
+
+   * [Hadley Wickham's style guide](https://style.tidyverse.org/)
+   * [R style guide from Google](https://google.github.io/styleguide/Rguide.html)
+
+ 2. R markdown:
+  
+   *  [R markdown definitive guide](https://bookdown.org/yihui/rmarkdown/)
+ 
+ 3. Stackexchange:
+
+   * [StackOveflow](https://stackoverflow.com)
+   * [CrossValidated](https://stats.stackexchange.com)
+ 
+ 4. [Statistical tools for high throughput data analysis](https://sthda.com)
+
+ 5. [R-bloggers](R-bloggers.com)
+
+ 6. Programming with tidyverse (heavy stuff!)
+
+    * [Programming with tidyverse](https://www.r-bloggers.com/2019/07/bang-bang-how-to-program-with-dplyr/)
+
+    * [Programming with dplyr](https://dplyr.tidyverse.org/articles/programming.html)
+
+ 7. Regular expressions
+
+    * Use the man page ([link](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html))
+
+    * Tutorial from [CRAN](https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html)
+
+    * [Another tutorial](https://rstudio-pubs-static.s3.amazonaws.com/74603_76cd14d5983f47408fdf0b323550b846.html)
+
+    * Regexp [lessons](https://regexone.com/) (not R!)
+
+ 7. Plotting
+
+    * [Top 50 visualizations](http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html)
+
+ 8. Developing packages
+
+    * Specification: [Writing R extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html) 
+
+    * [devtools Cheat sheet](https://rstudio.com/wp-content/uploads/2015/03/devtools-cheatsheet.pdf)
+
+    * [Happy git with R](https://happygitwithr.com/)
+
