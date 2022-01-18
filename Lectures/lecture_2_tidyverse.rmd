@@ -14,65 +14,10 @@ bibliography: "bibliography.bib"
 library(tidyverse)
 ```
 
-# (R)markdown
+## Todays plan
 
-## (R)markdown
-
-Markdown is a markup language: a way of indicating to the computers which
-parts of our text mean what, e.g. what is a header, what is a bullet list
-etc. Markdown is very, very simple and easy to read even when you are human
-(unlike XML or HTML).
-
-(Demo)
-
-## Markdown basics
-
- * Headers: `#`, `##`, `###`…
- * *italic* `*italic*` or `_italic_`
- * **bold** `**bold**` or `__bold__`
- * bullet lists: start with ` *` (space before!)
- * numbered lists: start with ` 2.` (space before!)
- * Superscript: a^2^ `a^2^`, subscript: a~2~ `a~2~`
-
-## So much more
-
- * tables (you can produce them in R with `kable` or `pander`)
- * code: demarkated using backticks (`` ` ``)
- * references: need a BibTeX file (you can get it from google scholar!)
- * images: `![my_portrait](portrait.jpeg)`
-
-## References
-
- * By default, always at the end of the document
- * open a new file, call it `bibliography.bib` or similar
- * go to Google scholar, search for a paper, click on "BibTeX" and copy the
-   contents to the file
- * add a line to the header of the Rmarkdown document:
- 
-       bibliography: "bibliography.bib"
- 
- * insert references like this: `[@weiner2018metabolite]` which generates: [@weiner2018metabolite]
-
-
-## Using R in markdown for fun and profit
-
-Inline R code:
-
-    The mtcars data set has `r nrow(mtcars)` rows.
-
-The mtcars data set has `r nrow(mtcars)` rows.
-
-## Using R in markdown for fun and profit
-
-Tables:
-
-```{r}
-library(knitr)
-kable(mtcars[1:4, ])
-```
-
-## Exercise session [2/0](../Exercises/day_2.md)
-
+ * While we are at it: tidyverse, while you are fresh and rested ;)
+ * Rmarkdown and manuscript writing
 
 # Tidyverse
 
@@ -118,9 +63,30 @@ kable(mtcars[1:4, ])
 
  * load with `library(tidyverse)`
  * some packages (e.g. `magrittr`) need to be loaded separately
- * never load `plyr` after `dplyr`
+ * never load `plyr` after `dplyr`. In fact, do not use `plyr`
 
 # Introducing tibbles
+
+## Data frames are lists
+
+Since we are talking about data frames, did you notice that a data frame
+*is a list*?
+
+```{r}
+is.list(data.frame(ID=1))
+```
+
+ * data frames look like matrices, but are not matrices!
+ * they are a special type of list
+
+## The problem with data frames
+
+ * It makes (mathematical) sense that a column or row of a matrix is not a matrix, but a
+   vector, since one-dimensional matrix is a vector
+ * however, `df[,1]` is a vector, but `df[1,]` is not (and cannot be! why?)
+ * data frames (and base R data frame operations) have nasty habits of
+   modifying your data: changing column names, turning columns into factors
+   etc.
 
 ## So many ways to skin a cat
 
@@ -138,6 +104,7 @@ data.frame has so many problems. Luckily, there are also so many solutions.
  * tbl[,3] returns a tbl rather than a vector
  * nicer printing (but... colorDF is WAY better ;-))
  * extra properties (`group_by` etc.)
+ * can give major headache when used in connection with Bioconductor
 
 ## Fine, but...
 
@@ -147,7 +114,7 @@ If you want to view more than the default portion of the tibble, do
 print(starwars, n=Inf, width=Inf)
 ```
 
-Row names: convert them to a column, use filter() instead of `[`
+Row names: convert them to a column with `rownames_to_column`, use filter() instead of `[`
 
 ## Reading data with readr
 
@@ -168,7 +135,7 @@ TSV / TAB separated values   `read.table()`                  `read_tsv()`,      
 CSV / comma separated        `read.csv()`,                    `read_csv()`,             a wrapper around          
                                                               `read_delim()`            `read.table()`            
                                                                                                                   
-XLS (old Excel)                                               `read_xls()`,             Avoid it!!!               
+XLS (old Excel)                                               `read_xls()`,             Avoid old Excel format!
                                                               `read_excel()`            From the                  
                                                                                         `readxl`
                                                                                         package.
@@ -185,9 +152,7 @@ XLSX (new Excel)                                              `read_xlsx()`,    
 
 
 
-## Exercise Session 2/1
-
-# Introducing Pipes
+## Exercise session [2/1](../Exercises/day_2.md)
 
 ## Introducing Pipes
 
@@ -219,6 +184,19 @@ mathematical set operators $\cup$ ("cup") and $\cap$ ("cap").
 <div class="columns-2">
 </div>
 
+## Simple beginner pipe
+
+```{r}
+`%=>%` <- function(a, func) {
+  func(a)
+}
+
+mtcars %=>% head
+
+## same as head(mtcars)
+```
+
+
 ## Introducing Pipes
 
 How about an operator that calls just any function? 
@@ -230,9 +208,11 @@ a %>% some_func(b)
 
 `%>%`(a, some_func(b))
 
-## is the same as
+## which then (with magic) becomes
 some_func(a, b)
 ```
+
+If you want to know more about this magic, read [Advanced R](http://adv-r.had.co.nz/) by Hadley Wickham. Not an easy read, though.
 
 ## Introducing Pipes
 
@@ -246,7 +226,7 @@ df %>% head
 
 ## Pipes in full: magrittr package
 
-![](../files/MagrittePipe.jpg){width=600px}
+![](images/MagrittePipe.jpg){width=600px}
 
 ## Ceci n'est pas une pipe
 
@@ -259,14 +239,56 @@ However, there is more to this package.
  * `%<>%` operator (instant assignment)
 
 
+## Simplified function notation
+
+OK, so you remember than in the following
+
+```{r}
+func <- function(.) { paste("Hello, ", .) }
+func("Dolly")
+```
+
+`func` is a variable holding a function; the actual function is the thing
+on the right. Also, dot is a simple variable name, just like `foo` or
+`size`.
+
+## Passing anonymous functions as arguments
+
+The following are equivalent:
+
+```{r,eval=FALSE}
+func <- function(.) { paste("Hello, ", .) }
+some_other_function(arguments, func)
+some_other_function(arguments, function(.) { paste("Hello, ", .) })
+
+## no need for braces with only one statement
+some_other_function(arguments, function(.) paste("Hello, ", .))
+```
+
+## Passing anonymous functions as arguments
+
+Programmers are lazy. Tired of writing `function(.) { ... }` they came up
+with a shorthand notation:
+
+```{r,eval=FALSE}
+some_other_function(arguments, ~ paste("Hello, ", .))
+```
+
+Here, the tilde (`~`) is the same as `function(.)`. That's it, no magic
+other than that. (almost no magic, sometimes the number of arguments is
+larger than 1, we will come to that later).
+
+We can only use it in tidyverse!!
+
+
 
 # dplyr
 
 ## dplyr: managing data
 
- * select, mutate, filter, rename, pull, arrange
+ * select, mutate, filter, rename, pull, arrange, all\_of, everything
  * distinct, sample\_{n,frac}, add\_count, add\_tally
- * summarise, \_at, \_if
+ * summarise, across, where
  * group\_by
 
 (Demo)
@@ -275,9 +297,23 @@ However, there is more to this package.
 
 Select columns from data:
 
-    mtcars %>% select(mpg)
+    starwars %>% select(name)
     mtcars %>% select(mpg, Cylinder=cyl)
     mtcars %>% select(starts_with("d"))
+    mtcars %>% select(everything())
+    starwars %>% select(name:mass)
+    starwars %>% select(where(is.numeric))
+
+## Selecting in tidyverse
+
+Note that we are not using quotes around the column names. These are so
+called *data variables*. In base R, we can also do something like this:
+
+```{r,eval=FALSE}
+# instead of starwars$name
+with(starwars, paste("Name:", name))
+```
+
 
 ## mutate
 
@@ -306,7 +342,9 @@ Sort the rows of the data
 mtcars %>% arrange(mpg)
 ```
 
-# Mapping in dplyr
+## Exercise Session 2/2
+
+# Grouping in dplyr
 
 ## `group_by`
 
@@ -333,29 +371,55 @@ Or you can use a more complex function:
 ```r
 ## which planet has the largest mean BMI?
 starwars %>% group_by(homeworld) %>%
-  summarise(bmi = mean(mass/(height/100)^2))
+  summarise(bmi = mean(mass/(height/100)^2)) %>%
+  arrange(bmi)
 ```
 
 ## Weird, weird world (heavy stuff)
 
 What if we don't want to choose a variable by hand?
 
-```r
-mtcars %>% group_by(cyl) %>% summarise_all(mean)
+```{r}
+## note: mean is now an argument to across!!!
+mtcars %>% group_by(cyl) %>% summarise(across(everything(), mean))
 ```
+
+## Weird, weird world (heavy stuff)
 
 Or, if we want something more complex, we use the `~ ...` form:
 
-```r
-mtcars %>% group_by(cyl) %>% summarise_all(~ mean(.)/sd(.))
+```{r}
+mtcars %>% group_by(cyl) %>% summarise(across(everything(), ~ mean(.)/sd(.)))
 ```
 
-The dot (`.`) stands for the argument. 
+The dot (`.`) stands for the argument.  (remember? dot is just a normal
+character, it can be a variable name!)
+
+## Even more heavy stuff
 
 
 
+```{r}
+starwars %>% summarise(across(where(is.numeric), mean))
+starwars %>% summarise(across(where(is.numeric), ~ mean(., na.rm=T)))
+```
 
-## Exercise Session 2/2
+## ....aaaaaand some more
+
+```{r}
+starwars %>% 
+  summarise(across(where(~ is.numeric(.) & sum(is.na(.)) < 10), ~ mean(., na.rm=T)))
+```
+
+ * where takes a function as an argument, so instead of the variable
+   holding a function we can use an anonymous function. It allows selecting
+   the variables for which this function gives a TRUE value
+ * across takes two arguments; first is a column selection (where, all\_of,
+   everything etc.); second is a function.
+
+
+
+## Exercise Session 2/3
 
 # Wide and Long data format
 
@@ -427,7 +491,18 @@ long <- read.table(header=TRUE, text='
 ```{r}
 ## not what we wanted!!!
 pivot_wider(long, names_from="condition", values_from="measurement")
+```
 
+What happened: all three remaining cols (subject, sampleID and sex) were
+used *together* as an identifier. Since sampleID is unique for each row,
+for sampleID ID000001 we only have a value for control, but no value for
+cond1 and cond2. Thus,
+we
+got a table with as many rows as in the long format, with plenty of NA's! 
+
+## Converting from long to wide
+
+```{r}
 ## Instead: 
 pivot_wider(long, id_cols=subject, names_from="condition", values_from="measurement")
 ```
@@ -458,12 +533,12 @@ You can then use several other functions.
 ## Use with caution!
 
 While tidyverse is great for interactive work, you should use it with
-caution in your packages:
+caution in your functions:
 
 ```{r eval=FALSE}
 foo <- function(df) {
   cols <- c("sex", "age")
-  df %<>% select(cols)
+  df <- df %>% select(cols)
 
   # ... do something
 
@@ -481,13 +556,255 @@ be explicit in your code:
 ```{r eval=FALSE}
 # make sure you select columns from variable 
 # and not by name
-df %<>% select(all_of(cols))
+df <- df %>% select(all_of(cols))
 
 # or, to use all but the columns in cols
-df %<>% select(!all_of(cols))
+df <- df %>% select(!all_of(cols))
 ```
 
 
-## Exercise Session 2/3
+
+
+## Of mice and men
+
+```{r, out.width = "800px",echo=FALSE}
+knitr::include_graphics("images/pnas_1.png")
+```
+
+## Of mice and men
+
+<table><tr><td>
+```{r, out.width = "400px",echo=FALSE}
+knitr::include_graphics("images/pnas_res_1.png")
+```
+</td><td>
+
+ * No or little correlation between transcriptomic responses in mouse
+   models and human models: $r^2 < 0.1$ – less than 10% of variance
+   explained
+
+ * No similarity in identified functions
+   
+</td></tr></table>
+
+## Of mice and men
+
+```{r, out.width = "800px",echo=FALSE}
+knitr::include_graphics("images/pnas_1.png")
+```
+
+```{r, out.width = "800px",echo=FALSE}
+knitr::include_graphics("images/pnas_2.png")
+```
+
+## Of mice and men
+
+<table><tr><td>
+```{r, out.width = "400px",echo=FALSE}
+knitr::include_graphics("images/pnas_res_1.png")
+```
+</td><td>
+
+ * Strong correlation between mouse and human transcriptomic responses for
+   genes which are regulated in one or the other condition:
+   $\rho \geq 0.5$; change direction correlated
+
+ * Similar functions for similarly regulated genes
+</td></tr></table>
+
+
+## Reproducibility, Repeatability, Replicability
+
+
+ * **Repeatability:** you can repeat your calculations precisely
+ 
+ * **Replicability:** Others can repeat your calculations precisely.
+
+ * **Reproducibility:** Other approaches to the same problem give
+   compatible results.
+
+*McArthur SL. Repeatability, Reproducibility, and Replicability: Tackling
+the 3R challenge in biointerface science and engineering.*
+
+## Of mice and men
+
+
+<table><tr><td>
+```{r, out.width = "400px",echo=FALSE}
+knitr::include_graphics("images/pnas_1.png")
+knitr::include_graphics("images/pnas_2.png")
+```
+</td><td>
+ * None of the papers was replicable, because precise description of
+   methods leading from data to results was missing. 
+
+
+ * At best, we were able to *roughly* reproduce the results using guesswork
+   and custom code
+
+
+</td></tr></table>
+
+
+# (R)markdown
+
+
+
+## markdown
+
+Markdown is a markup language: a way of indicating to the computers which
+parts of our text mean what, e.g. what is a header, what is a bullet list
+etc. Markdown is very, very simple and easy to read even when you are human
+(unlike XML or HTML).
+
+![](images/markdown_1.png)
+
+
+## Markdown basics
+
+ * Headers: `#`, `##`, `###`…
+ * *italic* `*italic*` or `_italic_`
+ * **bold** `**bold**` or `__bold__`
+ * bullet lists: start with ` *` (space before!)
+ * numbered lists: start with ` 2.` (space before!)
+ * Superscript: a^2^ `a^2^`, subscript: a~2~ `a~2~`
+
+## So much more
+
+ * tables (you can produce them in R with `kable` or `pander`)
+ * code: demarkated using backticks (`` ` ``, `` ``` ``)
+ * references: need a BibTeX file (you can get it from google scholar!)
+ * images: `![my_portrait](portrait.jpeg)`
+ * mathematical notations: $\chi^2 \sim - 2 \times \log\sum_{i=1}^k p_i$
+
+$$X = \begin{bmatrix}1 & x_{1}\\
+1 & x_{2}\\
+1 & x_{3}
+\end{bmatrix}$$
+
+## Rmarkdown
+
+![](images/markdown_2.png)
+
+
+## Using R in markdown for fun and profit
+
+Chunks:
+
+
+```{r}
+## this is R code inside of a chunk
+plot(density(rnorm(10000)))
+```
+
+Chunks have several options which determine how the output looks like,
+what type of graphics is produced (size, resolution) whether you can see
+the R code etc. etc.
+
+## Using R in markdown for fun and profit
+
+Inline R code:
+
+    The mtcars data set has `r '\x60r nrow(mtcars)\x60'` rows.
+
+Result:
+
+The mtcars data set has `r nrow(mtcars)` rows.
+
+## Using R in markdown for fun and profit
+
+Tables:
+
+```{r}
+library(knitr)
+kable(mtcars[1:4, ])
+```
+
+## Exercise session [2/5](../Exercises/day_2.md)
+
+## More on Rmarkdown
+
+ * the YAML header
+ * adding references
+ * bookdown
+
+## YAML header
+
+ * information about how the document should be rendered
+ * formatting options
+ * when you select options from Rstudio, they will modify the YAML header
+   (which is a good thing)
+ * contains title, author, abstract etc.
+
+## References
+
+ * By default, always at the end of the document
+ * open a new file, call it `bibliography.bib` or similar
+ * go to Google scholar, search for a paper, click on "BibTeX" and copy the
+   contents to the file
+ * add a line to the header of the Rmarkdown document:
+ 
+       bibliography: "bibliography.bib"
+ * insert references like this: `[@weiner2018metabolite]` which generates: [@weiner2018metabolite]
+
+## References: journal style
+
+ * go to [https://www.zotero.org/styles](https://www.zotero.org/styles) or
+   [https://github.com/citation-style-language/styles](https://github.com/citation-style-language/styles)
+ * find your journal and download the csl file (e.g. `nature.csl`). Save it
+   to where your Rmarkdown document is.
+ * In your YAML header, enter
+
+       csl: nature.csl
+
+## Quick exercise
+
+ Add a reference to your markdown document
+  
+  * go to google scholar, find a paper (e.g. the paper of Altschul on
+    BLAST)
+  * click on "cite". Then, click on BibTeX. Copy the text and paste it into
+    a document called "bibliography.bib"
+  * note the citation label in the first line (`altschul1997gapped`)
+  * save the document where your Rmarkdown document is.
+  * add the bibliography line to the YAML header
+  * enter the citation `[@altschul1997gapped]`
+  * knit the document and enjoy the result
+
+## Bookdown
+
+ Bookdown is an extension of Rmarkdown to make writing books easy
+
+ * referencing items (figures, equations etc.)
+ * each chapter is one file
+ * tons of hacks for specific occasions
+
+## Manuscript writing with Rmarkdown
+
+![](images/manuscript_1.png)
+
+* Advantages: you can easily collaborate with Word collaboration options
+* Disadvantages: manually entering output from R results in frequent
+  mistakes; also, it is tedious and boring
+
+## Manuscript writing with Rmarkdown
+
+![](images/manuscript_2.png)
+
+* Disadvantages: hard to collaborate, you need to manually enter all the
+  remarks from your co-authors
+* Advantages: easy, automatic updates of the manuscript; no manual editing
+  of figures or tables; no worries about the bibliography; easy to convert
+  a report to a presentation and a paper; easy to quickly see the effects
+  of one small change on your whole manuscript
+
+## Presentations with Rmarkdown
+
+ * Usually produces a HTML which can be viewed in any browser
+ * Two options are probably best suited for most purposes:
+
+    * `ioslides_presentation` (this one); advantage: a single file
+    * `xaringan`: better, nicer, cooler, but multiple files
+
 
 

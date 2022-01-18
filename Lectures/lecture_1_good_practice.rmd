@@ -453,12 +453,12 @@ Reduce(c, boring_data)
 
 Use `%...%` to define your own operators:
 
-    %M% <- function(a, b) setdiff(a, b)
+    `%M%` <- function(a, b) setdiff(a, b)
 
     1:10 %M% 3:4 
     # same as: setdiff(1:10, 3:4)
 
-    %P% <- function(a, b) paste0(a, b)
+    `%P%` <- function(a, b) paste0(a, b)
 
 You can also use special characters:
 
