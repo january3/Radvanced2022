@@ -35,6 +35,16 @@ library(tidyverse)
 > * Fewer people will understand your code
 > * Easy things are even easier, hard things are even harder
 > * Useful mostly for data frames and lists (but that's not entirely true)
+> * quickly evolving: all the time new functionality replaces old functionality
+
+## My take
+
+> * When writing published packages, I try to avoid tidyverse. I rather
+    re-implement the functionality then make my package depend on tidyverse.
+> * (and never make the package dependent on the `tidyverse` meta-package)
+> * If absolutely necessary, I import single packages and single functions
+> * I use tidyverse ad lib when writing reports and manuscripts (so
+    basically in Rmarkdown)
 
 
 # My god, it's full of packages
@@ -796,7 +806,8 @@ kable(mtcars[1:4, ])
 * Advantages: easy, automatic updates of the manuscript; no manual editing
   of figures or tables; no worries about the bibliography; easy to convert
   a report to a presentation and a paper; easy to quickly see the effects
-  of one small change on your whole manuscript
+  of one small change on your whole manuscript; you can use github for your
+  manuscripts!
 
 ## Presentations with Rmarkdown
 
