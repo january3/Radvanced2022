@@ -611,7 +611,7 @@ knitr::include_graphics("images/pnas_2.png")
 
 <table><tr><td>
 ```{r, out.width = "400px",echo=FALSE}
-knitr::include_graphics("images/pnas_res_1.png")
+knitr::include_graphics("images/pnas_res_2.png")
 ```
 </td><td>
 
