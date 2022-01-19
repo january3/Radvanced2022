@@ -110,6 +110,8 @@ lapply(tmp, function(.) paste(., collapse=", "))
 
 ## Mapping in R / in R + tidyverse
 
+Functions from the `purrr` package:
+
 ```{r eval=FALSE}
 map(tmp, ~ paste(., collapse=", "))
 
@@ -123,7 +125,7 @@ map_chr(tmp, ~ paste(., collapse=", "))
  * sometimes using tidyverse does not really give you a bonus (90% of the
    cases a regular lapply will do)
  * tidyverse notation with `~` is a bit more concise, but as any shorthand,
-   it can be confusing
+   it can be confusing (but you don't have to use it)
 
 ## Why not use `group_by` and `summarise`?
 
@@ -140,7 +142,7 @@ Also, mapping functions are way more powerful.
 `lapply` takes a list and returns a list, always.
 
 `sapply` takes a list and tries to simplify it to a relevant object (data
-frame, vector etc.). Which sometimes fails.
+frame, vector etc.). Which sometimes fails. Avoid it.
 
 Compare:
 
@@ -248,11 +250,26 @@ The same notation can be used also in dplyr with the `mutate_all` and
 
 ```{r eval=FALSE}
 ## Replace "none" by NA 
-starwars %>% mutate_all(~ gsub("none", NA, .))
+starwars %>% mutate(across(everything(), ~ gsub("none", NA, .)))
 
 ## Modify all variable names
-starwars %>% rename_all(~ paste0("Var_", .))
+starwars %>% rename_with(~ paste0("Var_", .))
 ```
+
+## Speaking of `rename_with`
+
+`rename_with` applies a function to the column *names* for all (default) or
+selected columns. For example, to make all columns start with a capital
+case:
+
+
+```{r}
+library(stringr)
+starwars %>% rename_with(str_to_title)
+```
+
+
+
 
 ## `map_dfr` and `map_dfc`
 
@@ -272,16 +289,59 @@ map_dfc(rv, ~ c(mean=mean(.), sd=sd(.)))
 
 ## `map2` et co.
 
-Sometimes you want to go over two or more vectors at the same time. 
+Sometimes you want to go over two or more vectors or lists at the same time. 
 Instead of `.` you have two automatic variable names, `.x` and `.y`.
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 ## add number of vehicles to each name
 sw_names <- starwars$name
 sw_vehcls <- starwars$vehicles
 map2_chr(sw_names, sw_vehcls, 
-  ~ paste0(.x, "_", length(.y)))
+  ~ paste(.x, "has", length(.y), "vehicle(s)")) %>%
+head
 ```
+
+## This last example...
+
+Can we improve it? "has no vehicles", "has 1 vehicle", "has 2 vehicles"?
+
+Introducing the `ifelse` function.
+
+
+```{r}
+nums <- 1:10
+ifelse(nums %% 2 == 0, "even", "uneven")
+```
+
+`ifelse` is a vectorized version of if. It takes three arguments of either
+the same length or length 1.
+
+## ifelse with expression data
+
+
+```{r}
+res <- read_csv("../Datasets/transcriptomics_results.csv") %>%
+  select(GeneName, ends_with("F.D1"))
+res <- res %>%
+  mutate(DEG=ifelse(qval.F.D1 < 0.05 & abs(logFC.F.D1) > 2, TRUE, FALSE))
+```
+
+## Back to vehicles
+
+```{r eval=TRUE}
+## add number of vehicles to each name
+sw_names <- starwars$name
+sw_vehcls <- starwars$vehicles
+vehcl_n <- map(sw_vehcls, length)
+
+vehcl_n <- ifelse(vehcl_n == 0, "no vehicles",
+                  ifelse(vehcl_n > 1, paste(vehcl_n, "vehicles"),
+                                      paste(vehcl_n, "vehicle")))
+
+paste(sw_names, "has", vehcl_n) %>% head
+```
+
+
 
 ## `pmap` and co.
 
@@ -318,6 +378,23 @@ name.
 vec <- list(last_name="Gates", first_name="Bill")
 map_chr(vec, ~ paste0(.y, ": ", .x)
 ```
+
+## `imap_*` – useful for rbinding data frames
+
+
+```{r}
+dfs <- list(
+            condA=data.frame(ID=1:3, res=rnorm(3)),
+            condB=data.frame(ID=1:3, res=rnorm(3)))
+
+imap_dfr(dfs, ~ {
+           .x$condition = .y
+           .x
+            })
+```
+
+
+
 
 
 

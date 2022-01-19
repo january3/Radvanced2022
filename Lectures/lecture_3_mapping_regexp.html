@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>lecture_3_mapping_regexp.utf8</title>
+  <title>lecture_3_mapping_regexp.knit</title>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -9,7 +9,7 @@
 
 
 
-  <meta name="date" content="2021-03-10" />
+  <meta name="date" content="2022-01-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -172,7 +172,7 @@ slide:not(.current) .plotly.html-widget{
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
       
       <p data-config-presenter><!-- populated from slide_config.json --></p>
-            <p style="margin-top: 6px; margin-left: -2px;">2021-03-10</p>
+            <p style="margin-top: 6px; margin-left: -2px;">2022-01-19</p>
           </hgroup>
   </slide>
 
@@ -250,6 +250,8 @@ lapply(tmp, function(x) paste(x, collapse=&quot;, &quot;))</pre>
 
 </article></slide><slide class=""><hgroup><h2>Mapping in R / in R + tidyverse</h2></hgroup><article  class="smaller " id="mapping-in-r-in-r-tidyverse-1">
 
+<p>Functions from the <code>purrr</code> package:</p>
+
 <pre class = 'prettyprint lang-r'>map(tmp, ~ paste(., collapse=&quot;, &quot;))
 
 ## type conversion is always specified
@@ -260,7 +262,7 @@ map_chr(tmp, ~ paste(., collapse=&quot;, &quot;))</pre>
 <ul>
 <li>The *pply functions are still widely used, so you will see them in code</li>
 <li>sometimes using tidyverse does not really give you a bonus (90% of the cases a regular lapply will do)</li>
-<li>tidyverse notation with <code>~</code> is a bit more concise, but as any shorthand, it can be confusing</li>
+<li>tidyverse notation with <code>~</code> is a bit more concise, but as any shorthand, it can be confusing (but you don’t have to use it)</li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>Why not use <code>group_by</code> and <code>summarise</code>?</h2></hgroup><article  class="smaller " id="why-not-use-group_by-and-summarise">
@@ -275,7 +277,7 @@ map_chr(tmp, ~ paste(., collapse=&quot;, &quot;))</pre>
 
 <p><code>lapply</code> takes a list and returns a list, always.</p>
 
-<p><code>sapply</code> takes a list and tries to simplify it to a relevant object (data frame, vector etc.). Which sometimes fails.</p>
+<p><code>sapply</code> takes a list and tries to simplify it to a relevant object (data frame, vector etc.). Which sometimes fails. Avoid it.</p>
 
 <p>Compare:</p>
 

@@ -87,3 +87,15 @@ data(mtcars)
 m.mtcars <- lm(mpg ~ cyl + hp + wt, data = mtcars)
 tab_model(m.mtcars)
 ```
+
+## formatR: reformat R code
+
+Can be run from R console or as an interactive shiny App.
+
+```{r, eval=FALSE}
+library(formatR)
+tidy_app()
+```
+
+
+

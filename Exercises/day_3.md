@@ -12,7 +12,7 @@
  3. Using the mtcars data set, `lapply` and `tapply`, calculate the mean
     and sd of all the parameters. How can you do it with summarise?
 
- 4. Read the data set [iris.tsv]("../Datasets/iris.tsv"). Use `lapply` to
+ 4. Use the built-in data set `iris` (`data(iris)`). Use `lapply` to
     calculate the mean of each column. Now try the same with the function
     `sapply`. What is the difference?
 
@@ -84,6 +84,6 @@
     core transcriptomic facility, but unfortunately it is not entirely
     clear to which samples they correspond. Also, they are not in the
     same order. Also, there are more files than samples. Find a reasonable matching.
-    Hint: use the `match` function from base R.
+    Hint: you could use the `match` function from base R.
 
 

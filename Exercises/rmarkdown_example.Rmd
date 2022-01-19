@@ -2,11 +2,26 @@
 title: "Example Rmarkdown document"
 author: "January Weiner"
 date: "1/18/2022"
-output: html_document
+output: 
+  html_document: 
+    theme: yeti
+    toc: true
+    toc_float: true
+  word_document: default
+  pdf_document: default
+bibliography: bibliography.bib
+csl: nature.csl
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+Cite the Altschul paper [@altschul1997gapped]
+
+```{r}
+
 ```
 
 ## R Markdown
@@ -21,10 +36,12 @@ summary(cars)
 
 ## Including Plots
 
-You can also embed plots, for example:
+You can also **embed** plots, for example:
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+## do some stuff
+library(pander)
+pander(mtcars, split.table=Inf)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot^[footnote].
