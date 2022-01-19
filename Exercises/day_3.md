@@ -9,7 +9,7 @@
     What do you observe? (interquartile range: function IQR). Extra: plot
     it!
 
- 3. Using the mtcars data set, `lapply` and `tapply`, calculate the mean
+ 3. Using the mtcars data set and `apply`, calculate the mean
     and sd of all the parameters. How can you do it with summarise?
 
  4. Use the built-in data set `iris` (`data(iris)`). Use `lapply` to

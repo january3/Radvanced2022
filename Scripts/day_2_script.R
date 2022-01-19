@@ -211,5 +211,17 @@ sel <- duplicated(c(1, 1, 2))
 c(1, 1, 2)[ !sel ]
 unique(c(1,1,2))
 
+wide <- read.table(header=TRUE, text='
+ subject sex control cond1 cond2
+       1   M     7.9  12.3  10.7
+       2   F     6.3  10.6  11.1
+       3   F     9.5  13.1  13.8
+       4   M    11.5  13.4  12.9
+')
+pivot_longer(wide, control:cond2, names_to="key",
+             values_to="measurement")
 
-
+wide$cols <- 1:4
+wide
+cols <- c("cond1", "cond2")
+wide %>% select(all_of(cols))
