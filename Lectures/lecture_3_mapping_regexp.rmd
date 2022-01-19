@@ -376,7 +376,7 @@ name.
 
 ```{r}
 vec <- list(last_name="Gates", first_name="Bill")
-map_chr(vec, ~ paste0(.y, ": ", .x)
+imap_chr(vec, ~ paste0(.y, ": ", .x)
 ```
 
 ## `imap_*` – useful for rbinding data frames

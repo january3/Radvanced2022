@@ -52,7 +52,7 @@
 
  2. Same as before (but harder)
 
-       * `G[:alnum:]*d O[:lower:]*n`
+       * `G[[:alnum:]]*d O[[:lower:]]*n`
        * `Janie's got a (pony|gun)`
 
  3. What regular expression can you use to match all of the following:
