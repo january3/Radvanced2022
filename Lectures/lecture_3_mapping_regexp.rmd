@@ -526,7 +526,7 @@ identifiers <- c("S001 ID9835", "S002-ID12363", "S003_ID84755")
 regex <- "(S[0-9]+)[ -_](ID[0-9]+)"
 data.frame(
   sample=gsub(regex, "\\1", identifiers),
-  ID=gsub(regex, "\\1", identifiers))
+  ID=gsub(regex, "\\2", identifiers))
 ```
 
 
