@@ -57,7 +57,7 @@
      2. Remove duplicate entries for each country (you can use the
         `duplicated` function for that)
      3. Select the columns id, country and the quantile columns
-     4. Use the `pivot_wider` function to create a long version of the table 
+     4. Use the `pivot_longer` function to create a long version of the table 
      5. Remove rows containing NA's using the `drop_na` function
 
  3. Using `group_by`, `summary` and `arrange` find out for which year there
