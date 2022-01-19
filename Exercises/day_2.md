@@ -60,7 +60,7 @@
      4. Use the `pivot_longer` function to create a long version of the table 
      5. Remove rows containing NA's using the `drop_na` function
 
- 3. Using `group_by`, `summary` and `arrange` find out for which year there
+ 3. Using `group_by`, `summarise` and `arrange` find out for which year there
     are the most data? For which year the overall average gini coefficient
     is highest / lowest? (mind the NA's!). Plot the average Gini
     coefficient over time.
