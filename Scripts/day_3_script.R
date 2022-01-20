@@ -146,3 +146,32 @@ mb_clean <- mb %>%
   mutate(ARM=gsub("^A.*", "AGRIPPAL", ARM)) %>%
   mutate(AGE=
            as.numeric(gsub(" ", "", gsub("^([0-9 ]*).*", "\\1", AGE)))) 
+
+
+
+a <- 1
+
+foo <- function(a) {
+  
+  a <<- 10
+  
+  
+}
+
+foo(a)
+a
+
+library(colorDF)
+
+summary_colorDF
+print
+print(mtcars)
+print(starwars)
+print
+class(starwars)
+typeof(starwars)
+
+print.data.frame(starwars)
+
+library(colorDF)
+colorDF:::print.colorDF(starwars)

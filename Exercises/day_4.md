@@ -1,4 +1,4 @@
-# Session 4/0 (optional, send me the e-mail with the results)
+# Session 4/0
 
  1. Create an alternative "summary" function for a data frame, such that if
     I type "summary(mtcars)" I will see the result of that function.
