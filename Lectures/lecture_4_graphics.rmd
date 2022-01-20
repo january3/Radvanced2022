@@ -19,9 +19,244 @@ knitr::opts_chunk$set(echo=TRUE,warning=FALSE,message=FALSE,fig.width=5,fig.heig
 library(tidyverse)
 library(ggthemes)
 library(readxl)
-#library(cowplot)
+library(colorDF)
+library(cowplot)
 #theme_set(theme_grey())
 ```
+
+
+## Plan for today
+
+ * Object oriented programming: a practical guide
+ * Graphics in R
+
+## So, have you ever wondered...
+
+How do you add objects other than numeric values?
+
+```{r}
+ggplot(mtcars, aes(x=mpg, y=hp)) + geom_point()
+```
+
+## So, have you ever wondered...
+
+What this may mean?
+
+
+```{r results="markdown"}
+print
+```
+
+What is this `UseMethod()` thing?
+
+
+## Object oriented programming
+
+ * classes of objects
+ * the same operator or function ("method") has different effects on
+   different objects
+ * for example, there are different `print` and `summary` functions called
+   depending on the type of the object to print or summarize
+ * In the OO context, a function is called a "method"
+ * Common methods such as `print`, `summary` are called "generics"
+
+## R: S3 and S4
+
+R implements two frameworks for OO programming:
+
+ * S3: easy to use, easy to understand, simple, informal, but elegant
+ * S4: complex, formalized, safer
+ * R6: yet another approach (also quite formalized), very similar to other
+   programming languages.
+
+All three are used in parallel. For example, BioConductor mostly uses S4,
+while tidyverse and base R only use S3.
+
+## Example: print
+
+```{r, eval=FALSE}
+class(starwars)
+print(starwars)
+print.data.frame(starwars)
+tibble:::print.tbl(starwars)
+```
+
+Although a tibble is also a data frame, the first class (`tbl`) takes
+precedence and it is displayed with the function from the `tibble` package.
+
+## What happens under the hood
+
+ * When R sees that `starwars` is an object of class `tbl`, and we call a
+   function `print` on that object, it first looks for a function called
+   `print.tbl`.
+ * Although we cannot see `print.tbl`, because it is not *attached* to our
+   namespace, it has been *loaded* with the `tibble` package and R can see
+   it.
+ * If such a function is found, it will be used.
+ * Otherwise, another class will be attempted
+ * If everything else fails, the default print method (`print.default`) will be used
+
+
+
+## It is super easy to define your own generic methods!
+
+```{r,results="markdown"}
+v1 <- "blabla"
+## add a class, not replace
+class(v1) <- c("bulba", class(v1))
+print.bulba <- function(x, ...) {
+  cat(paste0("An object of class bulba:\n", x, "\n"))
+}
+v1
+```
+
+Note that we add a new class, not replace it. That way, any generics that
+we have not defined for our new class will simply fall back to whatever is
+defined for the existing classes.
+
+## It is also easy to define your own generics
+
+```{r,results="markdown"}
+nonsense <- function(x, ...) { UseMethod("nonsense", x) }
+nonsense.default <- function(x, ...) {
+  cat("Oh well, not a bulba then.\n")
+}
+nonsense.bulba <- function(x, ...) {
+  cat(paste("This", x, "is nonsense!\n"))
+}
+nonsense(v1)
+nonsense(pi)
+```
+
+## But it gets better
+
+Remember that everything is a function? 
+
+We can define generic operators to work on our class!
+
+```{r,results="markdown"}
+v1 <- "a"
+class(v1) <- c("bulba", class(v1))
+v2 <- "b"
+class(v2) <- c("bulba", class(v2))
+
+`+.bulba` <- function(a, b) {
+  ret <- paste0(a, b)
+  class(ret) <- "bulba"
+  return(ret)
+}
+
+v1 + v2
+```
+
+## And this is how ggplot works.
+
+```{r,results="markdown"}
+g1 <- ggplot(data=mtcars, aes(x=disp, y=hp, color=mpg)) +
+  geom_point(size=5) + scale_color_viridis_c()
+class(g1)
+methods(class="gg")
+methods(class="ggplot")
+methods(print) %>% { .[grep("ggplot", .)] }
+```
+
+## A practical example
+
+I have created the colorDF package which defines a new colorDF class, which
+is basically your regular data frame or tibble plus some additional
+attributes which tell colorDF methods how to display the object using
+terminal colors.
+
+```{r}
+library(colorDF)
+mtcars %>% as.colorDF()
+```
+
+## Which methods have been defined for the colorDF class?
+
+```{r}
+methods(, "colorDF")
+colorDF:::print.colorDF
+```
+
+## `print.colorDF` / `print_colorDF`
+
+ * is not exported directly from package (instead, there is a function
+   called `print_colorDF`).
+ * displays by default only a number of rows (this can be changed with the
+   option `colorDF_n`)
+ * colors depend on the theme (option `colorDF_theme`)
+ * option `colorDF_tibble_style` means that we only display as many columns
+   as will fit on the screen
+
+## A practical example
+
+Fine, but I liked my output so much that I wanted *every* data frame to be
+displayed with `print.colorDF`. For this, I put the following in my
+`.Rprofile`:
+
+```{r}
+print.data.frame <- colorDF:::print.colorDF
+print.tbl        <- colorDF:::print.colorDF
+print.data.table <- colorDF:::print.colorDF
+```
+
+## A practical example
+
+The package S4Vectors defines an S4 class called `DataFrame`. I wanted my
+function to be able to display also DataFrame objects created by e.g.
+DESeq2. For this, I put the following in my `.Rprofile`:
+
+
+```{r}
+setMethod("show", "DataFrame", function(object) { colorDF:::print.colorDF(object) })
+```
+
+This is the S4 way of setting the default print (show) method for an object
+of S4 class `DataFrame`.
+
+## A practical example
+
+Also, I have implemented the method `summary.colorDF` (exported as
+`summary_colorDF`). Likewise, I have set up R to use it with the different data
+frame like objects in my `.Rprofile`:
+
+
+```{r}
+summary.data.frame <- colorDF:::summary.colorDF
+summary.tbl <- colorDF:::summary.colorDF
+summary.data.table <- colorDF:::summary.colorDF
+```
+
+(this part will not work for results of DESeq2; they are of class
+`DESeqResults`, which inherits from `DataFrame`, and have their own method
+defined for displaying a summary. Also, `summary_colorDF` does not yet
+understand DataFrame objects).
+
+## OK, what about the attributes
+
+I told you that a tibble is essentially a data frame:
+
+
+```{r}
+class(starwars)
+```
+
+So what changes when we add a grouping variable?
+
+
+## OK, what about the attributes
+
+
+```{r}
+attributes(starwars)
+sw <- starwars %>% group_by(homeworld)
+attributes(sw)
+```
+
+
+
+## Exercise 4/0
 
 
 
@@ -465,6 +700,21 @@ data <- wid2015sel %>%
 
 Now we pass the data to ggplot.
 
+```{r wid00,fig.width=8,fig.height=5,eval=FALSE,out.width="50%"}
+p <- data %>%
+  ggplot(aes(country, proportion, fill=quantile)) + geom_bar(stat="identity") 
+p
+```
+
+ * `geom_bar()` uses the `fill` esthetics
+ * `stat="identity"` means that the bar plot height has already been
+   calculated
+
+
+## Example session
+
+Now we pass the data to ggplot.
+
 ```{r wid01,fig.width=8,fig.height=5,eval=FALSE,out.width="50%"}
 p <- data %>%
   ggplot(aes(country, proportion, fill=quantile)) +
@@ -473,7 +723,6 @@ p
 ```
 
  * `coord_flip()` so the bar plot is horizontal
- * `geom_bar()` uses the `fill` esthetics
 
 ## Example session
  
@@ -828,115 +1077,6 @@ corresponds to which color?)
 
 ## Comparing 
 
-# How does ggplot2 work exactly?
-
-## The weird arithmetics of ggplot
-
-## Object oriented programming
-
- * classes of objects
- * the same operator or function ("method") has different effects on
-   different objects
- * for example, there are different `print` and `summary` functions called
-   depending on the type of the object to print or summarize
- * In the OO context, a function is called a "method"
- * Common methods such as `print`, `summary` are called "generics"
-
-## R: S3 and S4
-
-R implements two frameworks for OO programming:
-
- * S3: easy to use, easy to understand, simple, informal
- * S4: complex, formalized, safer
-
-Both are used in parallel.
-
-## Example: print
-
-```{r, eval=FALSE}
-class(starwars)
-print(starwars)
-print.data.frame(starwars)
-tibble:::print.tbl(starwars)
-```
-
-Although a tibble is also a data frame, the first class (`tbl`) takes
-precedence and it is displayed with the function from the `tibble` package.
-
-## What happens under the hood
-
- * When R sees that `starwars` is an object of class `tbl`, and we call a
-   function `print` on that object, it first looks for a function called
-   `print.tbl`.
- * Although we cannot see `print.tbl`, because it is not *attached* to our
-   namespace, it has been *loaded* with the `tibble` package and R can see
-   it.
- * If such a function is found, it will be used.
- * Otherwise, another class will be attempted
- * If everything else fails, the default print method will be used
-
-
-
-## It is super easy to define your own generic methods!
-
-```{r,results="markdown"}
-v1 <- "blabla"
-## add a class, not replace
-class(v1) <- c("bulba", class(v1))
-print.bulba <- function(x, ...) {
-  cat(paste0("An object of class bulba:\n", x, "\n"))
-}
-v1
-```
-
-## It is also easy to define your own generics
-
-```{r,results="markdown"}
-nonsense <- function(x, ...) { UseMethod("nonsense", x) }
-nonsense.default <- function(x, ...) {
-  cat("Oh well, not a bulba then.\n")
-}
-nonsense.bulba <- function(x, ...) {
-  cat(paste("This", x, "is nonsense!\n"))
-}
-nonsense(v1)
-nonsense(pi)
-```
-
-## But it gets better
-
-Remember that everything is a function? 
-
-We can define generic operators to work on our class!
-
-```{r,results="markdown"}
-v1 <- "a"
-class(v1) <- c("bulba", class(v1))
-v2 <- "b"
-class(v2) <- c("bulba", class(v2))
-
-`+.bulba` <- function(a, b) {
-  ret <- paste0(a, b)
-  class(ret) <- "bulba"
-  return(ret)
-}
-
-v1 + v2
-```
-
-## And this is how ggplot works.
-
-```{r,results="markdown"}
-g1 <- ggplot(data=mtcars, aes(x=disp, y=hp, color=mpg)) +
-  geom_point(size=5) + scale_color_viridis_c()
-class(g1)
-methods(class="gg")
-methods(class="ggplot")
-methods(print) %>% { .[grep("ggplot", .)] }
-```
-
-## Exercise 4/3 (optional)
-
 
 # ggplot2 tips and tricks
 
@@ -962,17 +1102,34 @@ the `theme()` help page. You can add themes. The result is again a theme
 object that you can reuse and even set as default. This makes it easy to
 create your own themes.
 
+## Working with themes
+
+Common uses of themes
+
+```{r,eval=FALSE}
+## set the theme to something nicer
+theme_set(theme_minimal())
+
+g1 <- ggplot(iris, aes(x=Sepal.Length,y=Sepal.Width,color=Species)) + 
+  geom_point()
+## Remove legend title
+g1 + theme(legend.title = element_blank())
+
+## Remove legend entirely
+g1 + theme(legend.position = "none")
+```
+
 ## logarithmic scaling
 
 In base R:
 
-```r
+```{r eval=FALSE}
 plot(...., log="xy") # to scale both axes
 ```
 
 In ggplot2:
 
-```r
+```{r eval=FALSE}
 ggplot(data, aes(...)) + ... + scale_x_log10
 ```
 
@@ -980,7 +1137,16 @@ ggplot(data, aes(...)) + ... + scale_x_log10
 
 To avoid labels which are overlaping, we can use the `ggrepel` package.
 
-(Demo)
+
+```{r}
+library(ggrepel)
+g1 <- ggplot(iris, aes(x=Sepal.Length,y=Sepal.Width,color=Species)) + 
+  geom_point()
+g1 + geom_label_repel(aes(label=Petal.Width))
+```
+
+
+
 
 ## Cowplot
 
@@ -989,10 +1155,6 @@ which is quite nice, and `plot_grid()`, which rocks. `plot_grid` allows you
 to create separate plots and combine them in a number of ways. You can even
 draw a plot in basic R, record it and include it in your `plot_grid` call!
 
-Note: Cowplot defines its own theme, `theme_cowplot()` and *automatically sets it
-when loaded* (I think that is no longer the case in the newest versions).
-It stays there even if you unload the package, however you can always use
-`theme_set()` to set the default theme to something else.
 
 
 ## `facet_grid`
@@ -1064,8 +1226,7 @@ for (i in 1:2) {
 }
 ```
 
-## Exercise 4/4
-
+## Exercise 4/3
 
 
 # The gapminder data set

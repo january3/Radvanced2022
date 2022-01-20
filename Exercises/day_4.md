@@ -1,3 +1,20 @@
+# Session 4/0 (optional, send me the e-mail with the results)
+
+ 1. Create an alternative "summary" function for a data frame, such that if
+    I type "summary(mtcars)" I will see the result of that function.
+ 2. Create a new class: sets. Create a function called `set` which turns a vector (character
+    or otherwise) into a set, just by adding the class `set`. (look at the
+    example from the lecture)
+ 3. Define print and summary functions for this class; that is, define
+    functions `print.set` and `summary.set`. For `print.set`, you might
+    want to use the construct `print(unclass(x))` – that is, remove the
+    class and use the default print function for a given data type.
+ 3. Use `+.set`, `/.set`, `-.set` etc. to define set operations on the set
+    class. Make sure that the returned object is also a set!
+
+        `+.set` <- function(x, y) { set(union(x, y)) }
+
+
 # Session 4/1
 
  1. Using the WIID data set, reproduce the example from lecture for another
@@ -44,16 +61,7 @@
  4. Plot the log fold changes on day 1 vs log fold changes on day 2 and
     color them by the disco score
 
-# Session 4/3 (optional, send me the e-mail with the results)
-
- 1. Create an alternative "summary" function for a data frame, such that if
-    I type "summary(mtcars)" I will see the result of that function.
- 2. Create a new class: sets. Define print and summary functions for this
-    class.
- 3. Use `+.sets` and `-.sets` etc. to define set operations on the set
-    class.
-
-# Session 4/4
+# Session 4/3
 
  1. The data set [expression_data_vaccination_example.xlsx](https://raw.githubusercontent.com/january3/Radvanced2021/master/Datasets/expression_data_vaccination_example.xlsx) 
     (large file!) contains raw data (microarray log signals) of gene expression in human
