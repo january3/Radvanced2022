@@ -12,8 +12,16 @@ lm_wrapper <- function(data, x_name, y_name) {
   message("Using formula:", formula)
   lm(as.formula(formula), data=data)
   
-  
 }
+
+
+cols <- c("Sepal.Width", "Species")
+iris$cols <- "nothing"
+
+library(tidyverse)
+iris %>% select(cols)
+iris %>% select(all_of(cols))
+
 
 data <- data.frame(x=rnorm(100))
 data$y <- rnorm(100) + data$x

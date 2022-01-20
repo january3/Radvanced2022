@@ -2,7 +2,7 @@
 
  1. Create an alternative "summary" function for a data frame, such that if
     I type "summary(mtcars)" I will see the result of that function.
- 2. Create a new class: sets. Create a function called `set` which turns a vector (character
+ 2. Create a new class: `set`. Create a function called `set` which turns a vector (character
     or otherwise) into a set, just by adding the class `set`. (look at the
     example from the lecture)
  3. Define print and summary functions for this class; that is, define
