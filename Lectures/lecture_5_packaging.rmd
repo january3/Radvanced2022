@@ -23,6 +23,59 @@ theme_set(theme_grey())
 ```
 
 
+# Organizing your work
+
+## Projects and project directories
+
+> * Keep all relevant files together – in one directory
+> * In the project directory, *always* create a README.md file
+> * Create a subdirectory "v1" or "mk1" or something (project versions)
+> * When your project is too cluttered, create a new version
+> * When you have published the files, made a presentation etc., do not
+>   touch this version again, start a new one.
+> * Backup your project files (and, separately, the input data)
+
+## Example project structure
+
+```
+my_important_project/
+     ├── README.md         // readme file, important!
+     ├── Data/             // input data, do not modify
+     │   └── README.md     // describe the source of the data
+     ├── Meta_data/        // meta data, do not modify
+     │   └── README.md     // describe the source of the data
+     ├── 20210101/
+     ├── 20210305/
+     └── Scripts/
+```
+
+## Relative vs absolute paths
+
+```{r eval=FALSE}
+## Not good!
+data <- read_csv("C://Users/January/Projects/MyProjects/data.csv")
+
+## Use this instead
+data <- read.csv("../Data/data.csv")
+```
+
+## Projects and project directories
+
+> * Never, ever use absolute paths. Always use relative paths.
+> * Separate functions in a script, use `source("myfuncs.R")` at the
+    beginning of your R script / Rmarkdown file
+> * In your script / Rmarkdown, create a block at the beginning where you
+    define your parameters (input file names, thresholds you will use etc.)
+> * if you find that you are using a function in more than one project, 
+    move it to a global R script file, or, better yet, to your custom
+    package
+
+## Testing the project
+
+> * Empty your R environment on a regular basis (remove `RData` / `.RData`
+    files)
+> * Make sure your markdown / script / pipeline runs correctly even in a
+    fresh, new project directory
 
 # R packaging
 
@@ -180,7 +233,7 @@ add2nums <- function(a, b) {
  * `@seealso` – other related functions
  * `@examples` – section with examples
 
-
+More on that [here](https://r-pkgs.org/man.html)
  
 
 ## Setting up new packages

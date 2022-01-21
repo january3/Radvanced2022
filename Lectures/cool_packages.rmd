@@ -26,6 +26,8 @@ theme_set(theme_grey())
 
 # Cool R packages
 
+## shiny: develop interactive apps
+
 ## glue: For quickly generating messages
 
 ```{r,echo=TRUE,results="markdown"}
@@ -96,6 +98,16 @@ Can be run from R console or as an interactive shiny App.
 library(formatR)
 tidy_app()
 ```
+
+
+
+## Further learning
+
+ * Hadley Wickham, Jenny Bryan, [R packages](https://r-pkgs.org/index.html)
+ * Yihui Xie, J. J. Allaire, Garrett Grolemund, [R markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+ * Winston Chang, [R Graphics Cookbook](https://r-graphics.org/)
+ * Hadley Wickham, Garrett Grolemund, [R for data science](https://r4ds.had.co.nz/)
+ * Michael J. Crowley, [The R Book](https://www.cs.upc.edu/~robert/teaching/estadistica/TheRBook.pdf) (additional materials [here](http://www.bio.ic.ac.uk/research/mjcraw/therbook/index.htm))
 
 
 
