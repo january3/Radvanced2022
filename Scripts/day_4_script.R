@@ -2,8 +2,18 @@ library(ggplot2)
 library(colorDF)
 library(tidyverse)
 g1 <- ggplot(iris, aes(x=Sepal.Width, y=Sepal.Length, color=Petal.Width)) + 
-  geom_point(shape=11) + scale_color_gradient()
+  geom_point()
 g1
+
+g2 <- ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) + geom_point()
+g2 + scale_color_discrete(labels=c(paste0(expression(italic("test")), expression(underline("I. setosa"))), "I. versicolor", "I. virginica"))
+
+
+
+library(cowplot)
+g3 <- plot_grid(g1, g2, g1, g2, labels=LETTERS[1:4], nrow=2)
+g3
+theme_set(theme_minimal())
 summary(iris)
 
 ggplot(iris, aes(x=Sepal.Width, y=Sepal.Length, color=Species)) + geom_point() +
@@ -187,3 +197,25 @@ exprs_byday <- exprs %>% pivot_longer(cols=starts_with(c("log", "q"))) %>%
 
 exprs_byday %>% ggplot(aes(x=logFC.F, y=-log10(qval.F), color=day, alpha=qval.F < 0.01)) + 
  scale_alpha_discrete(values=c("FALSE"=0.005, "TRUE"=0.5)) +  geom_point()
+
+
+
+x <- rnorm(1e5)
+plot(density(x))
+
+ggplot(data.frame(x=x), aes(x)) + geom_density()
+
+
+
+
+data <- read_csv("C:\\Users\January\.....\file.csv")
+
+data <- read_csv("../Data/file.csv")
+
+
+pval <- 0.01238887
+sprintf("p-value: %.2f", pval)
+format.pval(pval, digits=2)
+library(glue)
+glue("pval: {format.pval(pval, digits=2)}")
+

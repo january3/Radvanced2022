@@ -16,12 +16,16 @@ csl: nature.csl
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
+  
 
+\LaTeX
+
+\vspace{25mm}
 
 Cite the Altschul paper [@altschul1997gapped]
 
 ```{r}
-
+mtcars$mpg <- mtcars$mpg + 20
 ```
 
 ## R Markdown
@@ -38,7 +42,7 @@ summary(cars)
 
 You can also **embed** plots, for example:
 
-```{r pressure, echo=FALSE}
+```{r pressure, echo=FALSE,cache=TRUE}
 ## do some stuff
 library(pander)
 pander(mtcars, split.table=Inf)
