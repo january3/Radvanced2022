@@ -99,6 +99,9 @@ library(formatR)
 tidy_app()
 ```
 
+## ggtext
+
+ * rich formatting of ggplot labels, legend, text boxes
 
 
 ## Further learning
